@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User } from "@/types";
+
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: "user" | "admin";
+}
 
 interface DashboardContentProps {
   user: User;

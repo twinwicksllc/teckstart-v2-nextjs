@@ -50,20 +50,21 @@ export async function POST(request: NextRequest) {
     }
 
     const newProject = await withDatabase(async () => {
-      const result = await db.insert(projects).values({
+      await db.insert(projects).values({
         userId: session.id,
         name,
         clientName,
         clientEmail,
         description,
-        budget: budget ? parseFloat(budget) : null,
-        status: status || "active",
+        budget: budget ? parseFloat(budget).toFixed(2) : null,
+        status: (status || "active") as "active" | "completed" | "on_hold" | "cancelled",
       });
 
-      // Return the created project
+      // Return the most recently created project for this user
       return await db.select()
         .from(projects)
-        .where(eq(projects.id, Number(result.insertId)))
+        .where(eq(projects.userId, session.id))
+        .orderBy(desc(projects.createdAt))
         .limit(1);
     });
 
