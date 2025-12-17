@@ -55,8 +55,8 @@ export async function authenticateUser(email: string, password: string): Promise
 
     if (response.AuthenticationResult) {
       // Get user info from your database
-      const { db } = await import("./db");
-      const { users } = await import("../drizzle.schema");
+      const { db } = await import("@/lib/db");
+      const { users } = await import("@/drizzle.schema");
       const { eq } = await import("drizzle-orm");
 
       const userRecords = await db.select()
