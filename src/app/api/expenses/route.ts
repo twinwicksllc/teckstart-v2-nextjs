@@ -50,23 +50,24 @@ export async function POST(request: NextRequest) {
     }
 
     const newExpense = await withDatabase(async () => {
-      const result = await db.insert(expenses).values({
+      await db.insert(expenses).values({
         userId: session.id,
         vendor,
         description,
-        amount: parseFloat(amount),
-        taxAmount: taxAmount ? parseFloat(taxAmount) : null,
+        amount: parseFloat(amount).toFixed(2),
+        taxAmount: taxAmount ? parseFloat(taxAmount).toFixed(2) : null,
         expenseDate: new Date(expenseDate),
         projectId: projectId ? parseInt(projectId) : null,
         categoryId: categoryId ? parseInt(categoryId) : null,
-        source: "manual",
+        source: "manual" as const,
         isDeductible: true,
       });
 
-      // Return the created expense
+      // Return the most recently created expense for this user
       return await db.select()
         .from(expenses)
-        .where(eq(expenses.id, Number(result.insertId)))
+        .where(eq(expenses.userId, session.id))
+        .orderBy(desc(expenses.createdAt))
         .limit(1);
     });
 

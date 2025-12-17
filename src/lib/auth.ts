@@ -59,6 +59,13 @@ export async function authenticateUser(email: string, password: string): Promise
       const { users } = await import("@/drizzle.schema");
       const { eq } = await import("drizzle-orm");
 
+      const mapDbUser = (record: typeof users.$inferSelect): User => ({
+        id: record.id,
+        email: record.email,
+        name: record.name ?? record.email.split("@")[0],
+        role: record.role,
+      });
+
       const userRecords = await db.select()
         .from(users)
         .where(eq(users.email, email))
@@ -66,27 +73,31 @@ export async function authenticateUser(email: string, password: string): Promise
 
       if (userRecords.length === 0) {
         // Create user in database if not exists
-        const newUser = await db.insert(users).values({
+        await db.insert(users).values({
           email,
           loginMethod: "cognito",
           role: "user",
         });
 
+        const createdUser = await db.select()
+          .from(users)
+          .where(eq(users.email, email))
+          .limit(1);
+
+        if (createdUser.length === 0) {
+          return { success: false, error: "Failed to create user" };
+        }
+
         return {
           success: true,
-          user: {
-            id: Number(newUser.insertId),
-            email,
-            name: email.split("@")[0],
-            role: "user",
-          },
+          user: mapDbUser(createdUser[0]),
           token: response.AuthenticationResult.IdToken!,
         };
       }
 
       return {
         success: true,
-        user: userRecords[0],
+        user: mapDbUser(userRecords[0]),
         token: response.AuthenticationResult.IdToken!,
       };
     }
