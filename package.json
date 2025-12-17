@@ -39,4 +39,5 @@
     "eslint-config-next": "^16.0.10",
     "typescript": "^5"
   }
+  }
 }
