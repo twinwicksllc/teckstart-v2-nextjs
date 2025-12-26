@@ -86,11 +86,11 @@ Respond with only the JSON object.`;
     };
 
     const command = new InvokeModelCommand({
-      modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
       contentType: "application/json",
       accept: "application/json",
       body: JSON.stringify({
-        anthropic_version: "bedrock-2023-06-01",
+        anthropic_version: "bedrock-2023-05-31",
         max_tokens: 1024,
         messages: [message],
       }),
@@ -158,11 +158,11 @@ export async function parseReceiptWithHaiku(
     };
 
     const command = new InvokeModelCommand({
-      modelId: "anthropic.claude-3-5-haiku-20241022-v1:0",
+      modelId: "us.anthropic.claude-3-5-haiku-20241022-v1:0",
       contentType: "application/json",
       accept: "application/json",
       body: JSON.stringify({
-        anthropic_version: "bedrock-2023-06-01",
+        anthropic_version: "bedrock-2023-05-31",
         max_tokens: 512,
         messages: [message],
       }),
