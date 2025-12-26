@@ -10,6 +10,7 @@ async function runMigration() {
     const migrationSQL = fs.readFileSync(migrationPath, "utf8");
 
     console.log("Running migration: 0002_add_receipts_table.sql");
+    // @ts-ignore - neon client typing issue
     await sql(migrationSQL);
     console.log("✅ Migration completed successfully");
   } catch (error) {

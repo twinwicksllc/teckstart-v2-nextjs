@@ -1,6 +1,5 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
-import * as pdfParse from "pdf-parse";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || "us-east-1",
