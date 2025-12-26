@@ -40,7 +40,11 @@ export function AWSConfigForm() {
       const res = await fetch("/api/aws/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessKeyId, secretAccessKey, region }),
+        body: JSON.stringify({ 
+          accessKeyId: accessKeyId.trim(), 
+          secretAccessKey: secretAccessKey.trim(), 
+          region 
+        }),
       });
       
       if (res.ok) {

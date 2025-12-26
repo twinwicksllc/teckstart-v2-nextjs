@@ -35,11 +35,15 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { accessKeyId, secretAccessKey, region } = body;
+    let { accessKeyId, secretAccessKey, region } = body;
 
     if (!accessKeyId || !secretAccessKey) {
       return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
     }
+
+    // Trim whitespace to prevent copy-paste errors
+    accessKeyId = accessKeyId.trim();
+    secretAccessKey = secretAccessKey.trim();
 
     const encryptedAccessKey = encrypt(accessKeyId);
     const encryptedSecretKey = encrypt(secretAccessKey);
