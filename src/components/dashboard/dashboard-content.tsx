@@ -45,6 +45,15 @@ export function DashboardContent({ user }: DashboardContentProps) {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -64,7 +73,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
             <div className="flex items-center space-x-4">
               <span className="text-gray-600">Welcome, {user.name || user.email}</span>
-              <Button variant="outline" onClick={() => window.location.href = "/api/auth/logout"}>
+              <Button variant="outline" onClick={handleLogout}>
                 Logout
               </Button>
             </div>

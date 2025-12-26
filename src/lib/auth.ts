@@ -1,4 +1,4 @@
-import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cookies } from "next/headers";
 
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -21,19 +21,43 @@ export async function getServerSession(): Promise<User | null> {
   }
 
   try {
-    // Verify JWT token (simplified - you'd want proper JWT verification)
-    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/verify`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    // Verify token directly with Cognito
+    const command = new GetUserCommand({
+      AccessToken: token,
     });
 
-    if (!response.ok) {
+    const response = await cognitoClient.send(command);
+    
+    if (!response.Username) {
       return null;
     }
 
-    const user = await response.json();
-    return user;
+    // Get user from database
+    const { db } = await import("@/lib/db");
+    const { users } = await import("@/drizzle.schema");
+    const { eq } = await import("drizzle-orm");
+
+    const email = response.UserAttributes?.find(attr => attr.Name === "email")?.Value;
+    if (!email) {
+      return null;
+    }
+
+    const userRecords = await db.select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    if (userRecords.length === 0) {
+      return null;
+    }
+
+    const dbUser = userRecords[0];
+    return {
+      id: dbUser.id,
+      email: dbUser.email,
+      name: dbUser.name ?? email.split("@")[0],
+      role: dbUser.role,
+    };
   } catch (error) {
     console.error("Session verification failed:", error);
     return null;
