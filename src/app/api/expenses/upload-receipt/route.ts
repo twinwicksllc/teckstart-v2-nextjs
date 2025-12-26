@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
         fileSize: fileBuffer.length,
         fileType,
         s3Key: uploadResult.s3Key,
-        status: "pending",
       })
       .returning();
 
