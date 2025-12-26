@@ -1,7 +1,7 @@
 # TeckStart v2 - Next.js Version
 
 **Status:** 🚧 Under Development  
-**Architecture:** Next.js 14 (App Router) + AWS + MySQL  
+**Architecture:** Next.js 14 (App Router) + AWS + Neon PostgreSQL  
 **Deployment:** Vercel (Optimized)
 
 ## 🎯 Overview
@@ -36,14 +36,14 @@ TeckStart is a freelance expense and project tracker with AI-powered receipt par
 
 ### Backend
 - **API Routes:** Next.js API routes (serverless)
-- **Database:** MySQL with Drizzle ORM
+- **Database:** Neon PostgreSQL with Drizzle ORM
 - **Authentication:** AWS Cognito
 - **File Storage:** AWS S3
 - **AI Processing:** AWS Bedrock (planned)
 
 ### Infrastructure
 - **Hosting:** Vercel (optimized for Next.js)
-- **Database:** MySQL (serverless-optimized)
+- **Database:** Neon PostgreSQL (serverless-optimized)
 - **CDN:** Vercel Edge Network
 - **Monitoring:** Built-in Vercel Analytics
 
@@ -51,7 +51,7 @@ TeckStart is a freelance expense and project tracker with AI-powered receipt par
 
 ### Prerequisites
 - Node.js 18+ 
-- MySQL database
+- Neon PostgreSQL database
 - AWS account (Cognito + S3)
 - Vercel account
 
@@ -93,9 +93,9 @@ See `.env.example` for all required variables:
 
 ```bash
 # Database
-DATABASE_HOST=your_mysql_host
-DATABASE_USER=your_mysql_user
-DATABASE_PASSWORD=your_mysql_password
+DATABASE_HOST=your_postgresql_host
+DATABASE_USER=your_postgresql_user
+DATABASE_PASSWORD=your_postgresql_password
 DATABASE_NAME=teckstart
 
 # AWS
@@ -189,7 +189,7 @@ See `src/drizzle.schema.ts` for detailed schema.
 Set these in your Vercel dashboard:
 
 ```bash
-DATABASE_URL=mysql://...
+DATABASE_URL=postgresql://...
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
@@ -349,7 +349,7 @@ This section has moved here: [https://vitejs.dev/guide/troubleshooting.html](htt
 # TeckStart v2 - Next.js Version
 
 **Status:** 🚧 Under Development  
-**Architecture:** Next.js 14 (App Router) + AWS + MySQL  
+**Architecture:** Next.js 14 (App Router) + AWS + Neon PostgreSQL  
 **Deployment:** Vercel (Optimized)
 
 ## 🎯 Overview
@@ -384,14 +384,14 @@ TeckStart is a freelance expense and project tracker with AI-powered receipt par
 
 ### Backend
 - **API Routes:** Next.js API routes (serverless)
-- **Database:** MySQL with Drizzle ORM
+- **Database:** Neon PostgreSQL with Drizzle ORM
 - **Authentication:** AWS Cognito
 - **File Storage:** AWS S3
 - **AI Processing:** AWS Bedrock (planned)
 
 ### Infrastructure
 - **Hosting:** Vercel (optimized for Next.js)
-- **Database:** MySQL (serverless-optimized)
+- **Database:** Neon PostgreSQL (serverless-optimized)
 - **CDN:** Vercel Edge Network
 - **Monitoring:** Built-in Vercel Analytics
 
@@ -399,7 +399,7 @@ TeckStart is a freelance expense and project tracker with AI-powered receipt par
 
 ### Prerequisites
 - Node.js 18+ 
-- MySQL database
+- Neon PostgreSQL database
 - AWS account (Cognito + S3)
 - Vercel account
 
@@ -441,9 +441,9 @@ See `.env.example` for all required variables:
 
 ```bash
 # Database
-DATABASE_HOST=your_mysql_host
-DATABASE_USER=your_mysql_user
-DATABASE_PASSWORD=your_mysql_password
+DATABASE_HOST=your_postgresql_host
+DATABASE_USER=your_postgresql_user
+DATABASE_PASSWORD=your_postgresql_password
 DATABASE_NAME=teckstart
 
 # AWS
@@ -537,7 +537,7 @@ See `src/drizzle.schema.ts` for detailed schema.
 Set these in your Vercel dashboard:
 
 ```bash
-DATABASE_URL=mysql://...
+DATABASE_URL=postgresql://...
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...

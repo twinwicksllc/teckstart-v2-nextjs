@@ -1,24 +1,13 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from "@/drizzle.schema";
 
-// Serverless-optimized connection for Vercel
-const connection = mysql.createPool({
-  host: process.env.DATABASE_HOST,
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  database: process.env.DATABASE_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-  ssl: process.env.NODE_ENV === "production"
-    ? { rejectUnauthorized: false }
-    : undefined,
-});
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not defined');
+}
 
-export const db = drizzle(connection, { schema, mode: "default" });
+const sql = neon(process.env.DATABASE_URL);
+export const db = drizzle(sql, { schema });
 
 // Helper function for database operations with retry logic
 export async function withDatabase<T>(
