@@ -71,3 +71,5 @@ coverage/
 # AWS / SDK caches
 .aws-sam/
 .aws/
+.vercel
+.env*.local
