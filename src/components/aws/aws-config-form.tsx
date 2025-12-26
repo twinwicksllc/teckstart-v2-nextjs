@@ -49,7 +49,8 @@ export function AWSConfigForm() {
         setSecretAccessKey("");
         alert("Configuration saved!");
       } else {
-        alert("Failed to save configuration");
+        const data = await res.json();
+        alert(`Failed to save configuration: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error(error);
@@ -84,69 +85,114 @@ export function AWSConfigForm() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>AWS Cost Explorer Integration</CardTitle>
-        <CardDescription>
-          Connect your AWS account to automatically import expenses.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSave} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="accessKey">Access Key ID</Label>
-            <Input
-              id="accessKey"
-              value={accessKeyId}
-              onChange={(e) => setAccessKeyId(e.target.value)}
-              placeholder={configured ? "••••••••••••••••" : "AKIA..."}
-              required={!configured}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="secretKey">Secret Access Key</Label>
-            <Input
-              id="secretKey"
-              type="password"
-              value={secretAccessKey}
-              onChange={(e) => setSecretAccessKey(e.target.value)}
-              placeholder={configured ? "••••••••••••••••" : "Secret Key"}
-              required={!configured}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="region">Region</Label>
-            <Input
-              id="region"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              placeholder="us-east-1"
-            />
+    <div className="space-y-6">
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>AWS Cost Explorer Integration</CardTitle>
+          <CardDescription>
+            Connect your AWS account to automatically import expenses.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="accessKey">Access Key ID</Label>
+              <Input
+                id="accessKey"
+                value={accessKeyId}
+                onChange={(e) => setAccessKeyId(e.target.value)}
+                placeholder={configured ? "••••••••••••••••" : "AKIA..."}
+                required={!configured}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="secretKey">Secret Access Key</Label>
+              <Input
+                id="secretKey"
+                type="password"
+                value={secretAccessKey}
+                onChange={(e) => setSecretAccessKey(e.target.value)}
+                placeholder={configured ? "••••••••••••••••" : "Secret Key"}
+                required={!configured}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="region">Region</Label>
+              <Input
+                id="region"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                placeholder="us-east-1"
+              />
+            </div>
+            
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Saving..." : configured ? "Update Credentials" : "Connect AWS"}
+            </Button>
+          </form>
+
+          {configured && (
+            <div className="mt-6 pt-6 border-t">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-sm text-muted-foreground">
+                  Last synced: {lastSynced ? new Date(lastSynced).toLocaleString() : "Never"}
+                </div>
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={handleSync}
+                disabled={syncing}
+              >
+                {syncing ? "Syncing..." : "Sync Now"}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle className="text-lg">Security & Permissions</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm space-y-4 text-muted-foreground">
+          <div>
+            <h4 className="font-semibold text-foreground mb-1">Required Permissions</h4>
+            <p>
+              Create an IAM user with the following policy to allow Cost Explorer access:
+            </p>
+            <pre className="mt-2 p-2 bg-muted rounded-md text-xs overflow-x-auto">
+{`{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage"
+      ],
+      "Resource": "*"
+    }
+  ]
+}`}
+            </pre>
           </div>
           
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Saving..." : configured ? "Update Credentials" : "Connect AWS"}
-          </Button>
-        </form>
-
-        {configured && (
-          <div className="mt-6 pt-6 border-t">
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-sm text-muted-foreground">
-                Last synced: {lastSynced ? new Date(lastSynced).toLocaleString() : "Never"}
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleSync}
-              disabled={syncing}
-            >
-              {syncing ? "Syncing..." : "Sync Now"}
-            </Button>
+          <div>
+            <h4 className="font-semibold text-foreground mb-1">Data Security</h4>
+            <p>
+              Your credentials are <strong>encrypted at rest</strong> using AES-256 and transmitted securely via HTTPS. 
+              We never log your secret keys.
+            </p>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+            <p className="text-yellow-800 dark:text-yellow-200">
+              <strong>Note:</strong> For your security, the TeckStart team cannot view or recover your credentials. 
+              If you lose them, you will need to generate new keys in AWS and update them here.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
