@@ -5,14 +5,6 @@ import { db } from "@/lib/db";
 import { receipts } from "@/drizzle.schema";
 import { processReceiptWithAI } from "@/lib/receipt-processor";
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "50mb",
-    },
-  },
-};
-
 export async function POST(request: NextRequest) {
   try {
     // Verify user is authenticated
