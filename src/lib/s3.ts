@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import sharp from "sharp";
 
 const s3Client = new S3Client({
@@ -141,6 +142,19 @@ export async function uploadReceiptToS3(options: UploadReceiptOptions): Promise<
     console.error("S3 upload error:", error);
     throw new Error("Failed to upload file to storage. Please try again.");
   }
+}
+
+/**
+ * Generate a signed URL for viewing a receipt
+ */
+export async function getSignedReceiptUrl(s3Key: string): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: BUCKET_NAME,
+    Key: s3Key,
+  });
+
+  // URL expires in 1 hour
+  return await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 }
 
 /**

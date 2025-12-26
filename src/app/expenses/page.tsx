@@ -96,6 +96,23 @@ export default function ExpensesPage() {
                           ${expense.amount}
                         </p>
                         <div className="flex space-x-2">
+                          {expense.receiptFileKey && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch(`/api/expenses/${expense.id}/receipt`);
+                                  const data = await res.json();
+                                  if (data.url) window.open(data.url, '_blank');
+                                } catch (err) {
+                                  console.error("Failed to open receipt:", err);
+                                }
+                              }}
+                            >
+                              View Receipt
+                            </Button>
+                          )}
                           <Button 
                             variant="outline" 
                             size="sm"
