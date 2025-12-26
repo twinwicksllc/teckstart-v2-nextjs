@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
 
 interface User {
   id: number;
@@ -132,74 +133,88 @@ export function DashboardContent({ user }: DashboardContentProps) {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle>Recent Projects</CardTitle>
+              <CardTitle>Upload Receipt</CardTitle>
               <CardDescription>
-                Your latest freelance projects
+                AI-powered receipt parsing with Claude
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {projects.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">No projects yet</p>
-                  <Button onClick={() => window.location.href = "/projects/new"}>
-                    Create Your First Project
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {projects.slice(0, 5).map((project: any) => (
-                    <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">{project.name}</h3>
-                        <p className="text-sm text-gray-500">{project.clientName}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">${project.budget || 0}</p>
-                        <p className="text-sm text-gray-500">{project.status}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <ReceiptUploadForm />
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Expenses</CardTitle>
-              <CardDescription>
-                Your latest expense entries
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {expenses.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">No expenses yet</p>
-                  <Button onClick={() => window.location.href = "/expenses/new"}>
-                    Add Your First Expense
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {expenses.slice(0, 5).map((expense: any) => (
-                    <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">{expense.vendor}</h3>
-                        <p className="text-sm text-gray-500">{expense.description}</p>
+          <div className="lg:col-span-2 space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Projects</CardTitle>
+                <CardDescription>
+                  Your latest freelance projects
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {projects.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">No projects yet</p>
+                    <Button onClick={() => window.location.href = "/projects/new"}>
+                      Create Your First Project
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {projects.slice(0, 5).map((project: any) => (
+                      <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <h3 className="font-medium">{project.name}</h3>
+                          <p className="text-sm text-gray-500">{project.clientName}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">${project.budget || 0}</p>
+                          <p className="text-sm text-gray-500">{project.status}</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium">${expense.amount}</p>
-                        <p className="text-sm text-gray-500">{new Date(expense.expenseDate).toLocaleDateString()}</p>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Expenses</CardTitle>
+                <CardDescription>
+                  Your latest expense entries
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {expenses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">No expenses yet</p>
+                    <Button onClick={() => window.location.href = "/expenses/new"}>
+                      Add Your First Expense
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {expenses.slice(0, 5).map((expense: any) => (
+                      <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <h3 className="font-medium">{expense.vendor}</h3>
+                          <p className="text-sm text-gray-500">{expense.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">${expense.amount}</p>
+                          <p className="text-sm text-gray-500">{new Date(expense.expenseDate).toLocaleDateString()}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
