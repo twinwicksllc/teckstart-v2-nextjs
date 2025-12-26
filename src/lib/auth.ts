@@ -76,8 +76,10 @@ export async function authenticateUser(email: string, password: string): Promise
     });
 
     const response = await cognitoClient.send(command);
+    console.log("Cognito response received");
 
     if (response.AuthenticationResult) {
+      console.log("Authentication successful, fetching user from DB");
       // Get user info from your database
       const { db } = await import("@/lib/db");
       const { users } = await import("@/drizzle.schema");
@@ -94,14 +96,18 @@ export async function authenticateUser(email: string, password: string): Promise
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
+      
+      console.log("DB lookup complete, records found:", userRecords.length);
 
       if (userRecords.length === 0) {
+        console.log("User not found in DB, creating...");
         // Create user in database if not exists
         await db.insert(users).values({
           email,
           loginMethod: "cognito",
           role: "user",
         });
+        console.log("User created in DB");
 
         const createdUser = await db.select()
           .from(users)
@@ -115,21 +121,28 @@ export async function authenticateUser(email: string, password: string): Promise
         return {
           success: true,
           user: mapDbUser(createdUser[0]),
-          token: response.AuthenticationResult.IdToken!,
+          token: response.AuthenticationResult.AccessToken!,
         };
       }
 
       return {
         success: true,
         user: mapDbUser(userRecords[0]),
-        token: response.AuthenticationResult.IdToken!,
+        token: response.AuthenticationResult.AccessToken!,
       };
     }
 
     return { success: false, error: "Authentication failed" };
   } catch (error) {
-    console.error("Cognito authentication error:", error);
+    console.error("Cognito authentication error details:", error);
     if (error instanceof Error) {
+      // Check for specific Cognito errors
+      if (error.name === "UserNotConfirmedException") {
+        return { success: false, error: "Please confirm your email before logging in." };
+      }
+      if (error.name === "NotAuthorizedException") {
+        return { success: false, error: "Incorrect username or password." };
+      }
       return { success: false, error: error.message };
     }
     return { success: false, error: "Authentication failed" };
