@@ -15,15 +15,47 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+
+  const isValidEmail = (value: string) => {
+    // Basic email regex
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  };
+
+  const passwordIssues = (value: string): string[] => {
+    const issues: string[] = [];
+    if (value.length < 8) issues.push("At least 8 characters");
+    if (!/[A-Za-z]/.test(value)) issues.push("Contains a letter");
+    if (!/[0-9]/.test(value)) issues.push("Contains a number");
+    return issues;
+  };
+
+  const passwordsMatch = password === confirmPassword;
+  const emailOk = isValidEmail(email);
+  const passIssues = passwordIssues(password);
+  const canSubmit = emailOk && passwordsMatch && passIssues.length === 0 && !isLoading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+    if (!emailOk) {
+      setError("Please enter a valid email address.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!passwordsMatch) {
+      setError("Passwords do not match.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (passIssues.length > 0) {
+      setError(`Password requirements: ${passIssues.join(", ")}.`);
       setIsLoading(false);
       return;
     }
@@ -92,28 +124,52 @@ export function RegisterForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            {!emailOk && email.length > 0 && (
+              <p className="text-xs text-red-600">Please enter a valid email address.</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowPassword((v) => !v)}>
+                {showPassword ? "Hide" : "Show"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Must be at least 8 characters and include a letter and a number.</p>
+            {passIssues.length > 0 && password.length > 0 && (
+              <ul className="text-xs text-red-600 list-disc pl-4">
+                {passIssues.map((issue) => (
+                  <li key={issue}>{issue}</li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={() => setShowConfirmPassword((v) => !v)}>
+                {showConfirmPassword ? "Hide" : "Show"}
+              </Button>
+            </div>
+            {!passwordsMatch && confirmPassword.length > 0 && (
+              <p className="text-xs text-red-600">Passwords do not match.</p>
+            )}
           </div>
           {error && (
             <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
@@ -123,7 +179,7 @@ export function RegisterForm() {
           <Button 
             type="submit" 
             className="w-full" 
-            disabled={isLoading}
+            disabled={!canSubmit}
           >
             {isLoading ? "Creating account..." : "Register"}
           </Button>
