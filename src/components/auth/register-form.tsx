@@ -8,11 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginForm() {
+export function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,8 +22,14 @@ export function LoginForm() {
     setIsLoading(true);
     setError("");
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,10 +40,12 @@ export function LoginForm() {
       const data = await response.json();
 
       if (data.success) {
-        router.push("/dashboard");
-        router.refresh();
+        setSuccess(true);
+        setTimeout(() => {
+          router.push("/login");
+        }, 3000);
       } else {
-        setError(data.error || "Login failed");
+        setError(data.error || "Registration failed");
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
@@ -44,12 +54,30 @@ export function LoginForm() {
     }
   };
 
+  if (success) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Registration Successful!</CardTitle>
+          <CardDescription>
+            Your account has been created. Redirecting to login...
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            If you are not redirected, <Link href="/login" className="text-primary hover:underline">click here to login</Link>.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Login</CardTitle>
+        <CardTitle>Create an Account</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account
+          Enter your details to register for TeckStart
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -70,9 +98,20 @@ export function LoginForm() {
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
@@ -86,15 +125,15 @@ export function LoginForm() {
             className="w-full" 
             disabled={isLoading}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isLoading ? "Creating account..." : "Register"}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-primary hover:underline">
-            Register
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Sign in
           </Link>
         </p>
       </CardFooter>

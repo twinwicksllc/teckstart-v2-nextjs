@@ -1,4 +1,4 @@
-import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand, GetUserCommand, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cookies } from "next/headers";
 
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -150,4 +150,26 @@ export async function createSession(token: string, user: User): Promise<void> {
 export async function destroySession(): Promise<void> {
   const cookieStore = cookies();
   cookieStore.delete("auth-token");
+}
+export async function registerUser(email: string, password: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const command = new SignUpCommand({
+      ClientId: process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID!,
+      Username: email,
+      Password: password,
+      UserAttributes: [
+        { Name: "email", Value: email },
+      ],
+    });
+
+    await cognitoClient.send(command);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Registration error:", error);
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    }
+    return { success: false, error: "Registration failed" };
+  }
 }
