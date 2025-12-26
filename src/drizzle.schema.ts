@@ -4,6 +4,7 @@ export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const projectStatusEnum = pgEnum("project_status", ["active", "completed", "on_hold", "cancelled"]);
 export const expenseSourceEnum = pgEnum("expense_source", ["manual", "receipt_upload", "aws_auto"]);
 export const parsingStatusEnum = pgEnum("parsing_status", ["success", "failed", "partial"]);
+export const receiptStatusEnum = pgEnum("receipt_status", ["pending", "processing", "completed", "failed"]);
 
 /**
  * Core user table backing auth flow.
@@ -178,3 +179,54 @@ export const userPreferences = pgTable("userPreferences", {
 
 export type UserPreference = typeof userPreferences.$inferSelect;
 export type InsertUserPreference = typeof userPreferences.$inferInsert;
+
+/**
+ * Receipts table for tracking receipt file processing and AI parsing
+ */
+export const receipts = pgTable("receipts", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: integer("projectId").references(() => projects.id, { onDelete: "set null" }),
+  expenseId: integer("expenseId").references(() => expenses.id, { onDelete: "set null" }),
+  filePath: varchar("filePath", { length: 500 }).notNull(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileSize: integer("fileSize"),
+  fileType: varchar("fileType", { length: 100 }),
+  s3Key: varchar("s3Key", { length: 500 }),
+  status: receiptStatusEnum("status").default("pending").notNull(),
+  rawParsedData: jsonb("rawParsedData").$type<Record<string, any>>(),
+  normalizedData: jsonb("normalizedData").$type<{
+    merchantName?: string;
+    date?: string;
+    total?: number;
+    tax?: number;
+    currency?: string;
+    category?: string;
+    isTaxable?: boolean;
+    lineItems?: Array<{
+      description: string;
+      quantity?: number;
+      unitPrice?: number;
+      amount: number;
+    }>;
+  }>(),
+  merchantName: varchar("merchantName", { length: 255 }),
+  vendorName: varchar("vendorName", { length: 255 }),
+  confidenceScore: decimal("confidenceScore", { precision: 5, scale: 2 }),
+  retryCount: integer("retryCount").default(0).notNull(),
+  lastError: text("lastError"),
+  uploadedAt: timestamp("uploadedAt").defaultNow().notNull(),
+  processedAt: timestamp("processedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("receipts_userId_idx").on(table.userId),
+  projectIdIdx: index("receipts_projectId_idx").on(table.projectId),
+  expenseIdIdx: index("receipts_expenseId_idx").on(table.expenseId),
+  statusIdx: index("receipts_status_idx").on(table.status),
+  uploadedAtIdx: index("receipts_uploadedAt_idx").on(table.uploadedAt),
+}));
+
+export type Receipt = typeof receipts.$inferSelect;
+export type InsertReceipt = typeof receipts.$inferInsert;
+
