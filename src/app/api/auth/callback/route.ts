@@ -24,15 +24,23 @@ export async function GET(request: NextRequest) {
     const clientId = process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_AUTH_CALLBACK_URL || `${new URL(request.url).origin}/api/auth/callback`;
 
+    if (!domain || !clientId) {
+      console.error("Missing Cognito configuration:", { domain, clientId });
+      return NextResponse.redirect(new URL("/login?error=missing_config", request.url));
+    }
+
+    const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
+
     // Exchange code for tokens
-    const tokenResponse = await fetch(`${domain}/oauth2/token`, {
+    console.log("Exchanging code for tokens...");
+    const tokenResponse = await fetch(`${baseUrl}/oauth2/token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
         grant_type: "authorization_code",
-        client_id: clientId!,
+        client_id: clientId,
         code: code,
         redirect_uri: redirectUri,
       }),
@@ -48,7 +56,8 @@ export async function GET(request: NextRequest) {
     const { access_token, id_token } = tokens;
 
     // Get user info from Cognito
-    const userInfoResponse = await fetch(`${domain}/oauth2/userInfo`, {
+    console.log("Fetching user info...");
+    const userInfoResponse = await fetch(`${baseUrl}/oauth2/userInfo`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -64,10 +73,12 @@ export async function GET(request: NextRequest) {
     const email = userInfo.email;
     const name = userInfo.name || userInfo.given_name || email.split("@")[0];
 
+    console.log("Syncing user with database:", email);
     // Sync with database
     let user = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     if (user.length === 0) {
+      console.log("Creating new user in database...");
       await db.insert(users).values({
         email,
         name,
@@ -77,6 +88,7 @@ export async function GET(request: NextRequest) {
       user = await db.select().from(users).where(eq(users.email, email)).limit(1);
     }
 
+    console.log("Login successful, redirecting to dashboard");
     // Create response and set cookie
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     

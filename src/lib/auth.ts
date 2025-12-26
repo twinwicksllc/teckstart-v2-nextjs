@@ -29,6 +29,7 @@ export async function getServerSession(): Promise<User | null> {
     const response = await cognitoClient.send(command);
     
     if (!response.Username) {
+      console.error("getServerSession: No username in Cognito response");
       return null;
     }
 
@@ -39,6 +40,7 @@ export async function getServerSession(): Promise<User | null> {
 
     const email = response.UserAttributes?.find(attr => attr.Name === "email")?.Value;
     if (!email) {
+      console.error("getServerSession: No email in Cognito user attributes");
       return null;
     }
 
@@ -48,6 +50,7 @@ export async function getServerSession(): Promise<User | null> {
       .limit(1);
 
     if (userRecords.length === 0) {
+      console.error(`getServerSession: User not found in database for email: ${email}`);
       return null;
     }
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -14,6 +14,22 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      if (errorParam === "no_session") {
+        setError("Your session could not be verified. Please try logging in again.");
+      } else if (errorParam === "token_exchange_failed") {
+        setError("Failed to exchange authentication code. Please try again.");
+      } else if (errorParam === "user_info_failed") {
+        setError("Failed to retrieve user information. Please try again.");
+      } else {
+        setError(`Authentication error: ${errorParam}`);
+      }
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,8 +71,11 @@ export function LoginForm() {
       return;
     }
 
-    const url = `${domain}/oauth2/authorize?identity_provider=Google&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
+    // Ensure domain has protocol
+    const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
+    const url = `${baseUrl}/oauth2/authorize?identity_provider=Google&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
     
+    console.log("Redirecting to Google login:", url);
     window.location.href = url;
   };
 

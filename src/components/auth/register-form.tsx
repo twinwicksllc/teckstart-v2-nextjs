@@ -97,8 +97,11 @@ export function RegisterForm() {
       return;
     }
 
-    const url = `${domain}/oauth2/authorize?identity_provider=Google&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
+    // Ensure domain has protocol
+    const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
+    const url = `${baseUrl}/oauth2/authorize?identity_provider=Google&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
     
+    console.log("Redirecting to Google login:", url);
     window.location.href = url;
   };
 
