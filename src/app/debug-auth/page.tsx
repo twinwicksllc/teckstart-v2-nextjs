@@ -30,19 +30,49 @@ export default async function DebugAuthPage() {
       const region = process.env.AWS_REGION || "us-east-1";
       log(`Using region: ${region}`);
       
-      const client = new CognitoIdentityProviderClient({
-        region: region,
-      });
-      
-      log("Sending GetUserCommand to Cognito...");
-      const command = new GetUserCommand({ AccessToken: authToken.value });
-      
-      const response = await client.send(command);
-      log(`Cognito Response: Username=${response.Username}`);
-      
-      const emailAttr = response.UserAttributes?.find(a => a.Name === "email");
-      const email = emailAttr?.Value;
-      log(`Email attribute found: ${email}`);
+      // Try UserInfo endpoint first
+      const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN;
+      let email: string | undefined;
+
+      if (domain) {
+        const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
+        log(`Attempting UserInfo endpoint: ${baseUrl}/oauth2/userInfo`);
+        try {
+          const userInfoResponse = await fetch(`${baseUrl}/oauth2/userInfo`, {
+            headers: { Authorization: `Bearer ${authToken.value}` },
+            cache: 'no-store'
+          });
+          
+          if (userInfoResponse.ok) {
+            const data = await userInfoResponse.json();
+            email = data.email;
+            log(`UserInfo success! Email: ${email}`);
+          } else {
+            log(`UserInfo failed with status: ${userInfoResponse.status}`);
+            const text = await userInfoResponse.text();
+            log(`Response: ${text}`);
+          }
+        } catch (e: any) {
+          log(`UserInfo fetch error: ${e.message}`);
+        }
+      }
+
+      // Fallback to GetUserCommand
+      if (!email) {
+        log("Attempting GetUserCommand fallback...");
+        const client = new CognitoIdentityProviderClient({
+          region: region,
+        });
+        
+        const command = new GetUserCommand({ AccessToken: authToken.value });
+        
+        const response = await client.send(command);
+        log(`Cognito Response: Username=${response.Username}`);
+        
+        const emailAttr = response.UserAttributes?.find(a => a.Name === "email");
+        email = emailAttr?.Value;
+        log(`Email attribute found: ${email}`);
+      }
       
       if (email) {
         log("Checking database for user...");
@@ -61,8 +91,7 @@ export default async function DebugAuthPage() {
           log(`Lowercase DB Records found: ${lowerRecords.length}`);
         }
       } else {
-        log("No email attribute in Cognito response");
-        log(`Available attributes: ${response.UserAttributes?.map(a => a.Name).join(", ")}`);
+        log("No email attribute found via UserInfo or GetUserCommand");
       }
       
     } catch (e: any) {

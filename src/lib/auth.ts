@@ -17,63 +17,98 @@ export async function getServerSession(): Promise<User | null> {
   const token = cookieStore.get("auth-token")?.value;
 
   if (!token) {
+    console.log("getServerSession: No auth-token cookie found");
     return null;
   }
 
   try {
-    // Verify token directly with Cognito
-    const command = new GetUserCommand({
-      AccessToken: token,
-    });
-
-    const response = await cognitoClient.send(command);
+    console.log("getServerSession: Verifying token (token length:", token.length, ")");
     
-    if (!response.Username) {
-      console.error("getServerSession: No username in Cognito response");
+    let email: string | undefined;
+
+    // 1. Try UserInfo endpoint (Required for Google/OAuth tokens)
+    const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN;
+    if (domain) {
+      const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
+      try {
+        console.log("getServerSession: Attempting UserInfo endpoint...");
+        const userInfoResponse = await fetch(`${baseUrl}/oauth2/userInfo`, {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
+        });
+        
+        if (userInfoResponse.ok) {
+          const data = await userInfoResponse.json();
+          email = data.email;
+          console.log("getServerSession: UserInfo success, email:", email);
+        } else {
+          console.log("getServerSession: UserInfo failed with status:", userInfoResponse.status);
+        }
+      } catch (e) {
+        console.error("getServerSession: UserInfo fetch error:", e);
+      }
+    }
+
+    // 2. Fallback to GetUserCommand (For native Cognito tokens)
+    if (!email) {
+      try {
+        console.log("getServerSession: Attempting GetUserCommand fallback...");
+        const command = new GetUserCommand({ AccessToken: token });
+        const response = await cognitoClient.send(command);
+        email = response.UserAttributes?.find(attr => attr.Name === "email")?.Value;
+        console.log("getServerSession: GetUserCommand success, email:", email);
+      } catch (e) {
+        console.error("getServerSession: GetUserCommand failed:", e instanceof Error ? e.message : e);
+      }
+    }
+    
+    if (!email) {
+      console.error("getServerSession: Could not retrieve email from token");
       return null;
     }
+
+    const normalizedEmail = email.toLowerCase();
 
     // Get user from database
     const { db } = await import("@/lib/db");
     const { users } = await import("@/drizzle.schema");
     const { eq } = await import("drizzle-orm");
 
-    const email = response.UserAttributes?.find(attr => attr.Name === "email")?.Value;
-    if (!email) {
-      console.error("getServerSession: No email in Cognito user attributes");
-      return null;
-    }
-
     const userRecords = await db.select()
       .from(users)
-      .where(eq(users.email, email))
+      .where(eq(users.email, normalizedEmail))
       .limit(1);
 
     if (userRecords.length === 0) {
-      console.error(`getServerSession: User not found in database for email: ${email}`);
+      console.error(`getServerSession: User not found in database for email: ${normalizedEmail}`);
       return null;
     }
 
     const dbUser = userRecords[0];
+    console.log("getServerSession: User found in DB:", dbUser.id);
     return {
       id: dbUser.id,
       email: dbUser.email,
-      name: dbUser.name ?? email.split("@")[0],
+      name: dbUser.name ?? normalizedEmail.split("@")[0],
       role: dbUser.role,
     };
   } catch (error) {
-    console.error("Session verification failed:", error);
+    console.error("getServerSession: Session verification failed:", error);
+    if (error instanceof Error) {
+      console.error("getServerSession: Error message:", error.message);
+    }
     return null;
   }
 }
 
 export async function authenticateUser(email: string, password: string): Promise<{ success: boolean; user?: User; token?: string; error?: string }> {
   try {
+    const normalizedEmail = email.toLowerCase();
     const command = new InitiateAuthCommand({
       AuthFlow: "USER_PASSWORD_AUTH",
       ClientId: (process.env.AWS_COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID)!,
       AuthParameters: {
-        USERNAME: email,
+        USERNAME: normalizedEmail,
         PASSWORD: password,
       },
     });
@@ -95,20 +130,20 @@ export async function authenticateUser(email: string, password: string): Promise
 
       const userRecords = await db.select()
         .from(users)
-        .where(eq(users.email, email))
+        .where(eq(users.email, normalizedEmail))
         .limit(1);
 
       if (userRecords.length === 0) {
         // Create user in database if not exists
         await db.insert(users).values({
-          email,
+          email: normalizedEmail,
           loginMethod: "cognito",
           role: "user",
         });
 
         const createdUser = await db.select()
           .from(users)
-          .where(eq(users.email, email))
+          .where(eq(users.email, normalizedEmail))
           .limit(1);
 
         if (createdUser.length === 0) {
