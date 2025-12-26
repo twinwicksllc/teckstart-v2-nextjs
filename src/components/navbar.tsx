@@ -28,6 +28,7 @@ export function Navbar({ user }: NavbarProps) {
     { name: "Projects", href: "/projects" },
     { name: "Expenses", href: "/expenses" },
     { name: "Insights", href: "/analytics" },
+    { name: "AWS", href: "/dashboard/aws" },
   ];
 
   return (

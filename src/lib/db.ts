@@ -2,6 +2,17 @@ import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from "@/drizzle.schema";
 
+// Ensure env vars are loaded if running in script context
+if (!process.env.DATABASE_URL && typeof window === 'undefined') {
+  try {
+    const dotenv = require('dotenv');
+    const path = require('path');
+    dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+  } catch (e) {
+    // Ignore error if dotenv is not available or fails
+  }
+}
+
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not defined');
 }

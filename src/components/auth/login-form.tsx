@@ -21,6 +21,10 @@ export function LoginForm() {
     if (errorParam) {
       if (errorParam === "no_session") {
         setError("Your session could not be verified. Please try logging in again.");
+      } else if (errorParam === "missing_cookie") {
+        setError("Your browser is not sending the authentication cookie. Please check your browser settings or try a different browser.");
+      } else if (errorParam === "invalid_session") {
+        setError("Your session has expired or is invalid. Please log in again.");
       } else if (errorParam === "token_exchange_failed") {
         setError("Failed to exchange authentication code. Please try again.");
       } else if (errorParam === "user_info_failed") {

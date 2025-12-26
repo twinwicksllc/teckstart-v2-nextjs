@@ -91,6 +91,9 @@ export const expenses = pgTable("expenses", {
   aiParsed: boolean("aiParsed").default(false).notNull(),
   aiConfidence: decimal("aiConfidence", { precision: 5, scale: 2 }),
   source: expenseSourceEnum("source").default("manual").notNull(),
+  awsService: varchar("awsService", { length: 255 }),
+  awsTags: jsonb("awsTags").$type<Record<string, string>>(),
+  fingerprint: varchar("fingerprint", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 }, (table) => ({
@@ -98,11 +101,32 @@ export const expenses = pgTable("expenses", {
   projectIdIdx: index("expenses_projectId_idx").on(table.projectId),
   categoryIdIdx: index("expenses_categoryId_idx").on(table.categoryId),
   expenseDateIdx: index("expenses_expenseDate_idx").on(table.expenseDate),
+  fingerprintIdx: index("expenses_fingerprint_idx").on(table.fingerprint),
   sourceIdx: index("expenses_source_idx").on(table.source),
 }));
 
 export type Expense = typeof expenses.$inferSelect;
 export type InsertExpense = typeof expenses.$inferInsert;
+
+/**
+ * AWS Configurations for multiple accounts
+ */
+export const awsConfigs = pgTable("awsConfigs", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  awsAccessKeyId: text("awsAccessKeyId").notNull(), // Encrypted
+  awsSecretAccessKey: text("awsSecretAccessKey").notNull(), // Encrypted
+  awsRegion: varchar("awsRegion", { length: 50 }).default("us-east-1").notNull(),
+  awsAccountId: varchar("awsAccountId", { length: 20 }),
+  lastSyncedAt: timestamp("lastSyncedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("awsConfigs_userId_idx").on(table.userId),
+}));
+
+export type AwsConfig = typeof awsConfigs.$inferSelect;
+export type InsertAwsConfig = typeof awsConfigs.$inferInsert;
 
 /**
  * Vendor templates for caching receipt parsing patterns

@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/login?error=user_info_failed", request.url));
     }
 
-    const email = userInfo.email;
+    const email = userInfo.email.toLowerCase();
     const name = userInfo.name || userInfo.given_name || email.split("@")[0];
 
     console.log("Syncing user with database:", email);
@@ -92,13 +92,16 @@ export async function GET(request: NextRequest) {
     // Create response and set cookie
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     
-    response.cookies.set("auth-token", access_token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "lax" as const,
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
-    });
+    };
+
+    console.log("Setting auth-token cookie with options:", { ...cookieOptions, secure: cookieOptions.secure });
+    response.cookies.set("auth-token", access_token, cookieOptions);
 
     return response;
   } catch (err) {
