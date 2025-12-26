@@ -5,15 +5,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
+import { Navbar } from "@/components/navbar";
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editingExpense, setEditingExpense] = useState<any>(null);
 
   useEffect(() => {
     fetchExpenses();
+    fetchUser();
   }, []);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("/api/auth/verify");
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
 
   const fetchExpenses = async () => {
     try {
@@ -52,23 +67,15 @@ export default function ExpensesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
-                &larr; Back to Dashboard
-              </Link>
-              <h1 className="text-3xl font-bold text-gray-900">Expenses</h1>
-            </div>
-            <Link href="/expenses/new">
-              <Button>Add Expense</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Navbar user={user} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Expenses</h1>
+          <Link href="/expenses/new">
+            <Button>Add Expense</Button>
+          </Link>
+        </div>
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
             {expenses.length === 0 ? (
@@ -87,9 +94,15 @@ export default function ExpensesPage() {
                         <p className="text-sm font-medium text-blue-600 truncate">
                           {expense.vendor}
                         </p>
-                        <p className="text-xs text-gray-500">
-                          {expense.projectId ? `Project ID: ${expense.projectId}` : "General Business Expense"}
-                        </p>
+                        <div className="flex items-center space-x-2">
+                          <p className="text-xs text-gray-500">
+                            {expense.projectName ? `Project: ${expense.projectName}` : "General Business Expense"}
+                          </p>
+                          <span className="text-gray-300">•</span>
+                          <p className="text-xs font-medium text-purple-600">
+                            {expense.categoryName || "Uncategorized"}
+                          </p>
+                        </div>
                       </div>
                       <div className="flex items-center space-x-4">
                         <p className="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">

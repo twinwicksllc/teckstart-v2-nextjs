@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
 import { withDatabase } from "@/lib/db";
 import { db } from "@/lib/db";
-import { expenses } from "@/drizzle.schema";
-import { eq, and, desc } from "drizzle-orm";
+import { expenses, expenseCategories, projects } from "@/drizzle.schema";
+import { eq, and, desc, leftJoin } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,8 +14,23 @@ export async function GET(request: NextRequest) {
     }
 
     const userExpenses = await withDatabase(async () => {
-      return await db.select()
+      return await db.select({
+        id: expenses.id,
+        vendor: expenses.vendor,
+        amount: expenses.amount,
+        expenseDate: expenses.expenseDate,
+        description: expenses.description,
+        receiptUrl: expenses.receiptUrl,
+        receiptFileKey: expenses.receiptFileKey,
+        categoryId: expenses.categoryId,
+        categoryName: expenseCategories.name,
+        projectId: expenses.projectId,
+        projectName: projects.name,
+        aiParsed: expenses.aiParsed,
+      })
         .from(expenses)
+        .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
+        .leftJoin(projects, eq(expenses.projectId, projects.id))
         .where(eq(expenses.userId, session.id))
         .orderBy(desc(expenses.expenseDate))
         .limit(50);

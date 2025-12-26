@@ -5,15 +5,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ProjectEditModal } from "@/components/projects/project-edit-modal";
+import { Navbar } from "@/components/navbar";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<any>(null);
 
   useEffect(() => {
     fetchProjects();
+    fetchUser();
   }, []);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("/api/auth/verify");
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      }
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -52,23 +67,15 @@ export default function ProjectsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
-                &larr; Back to Dashboard
-              </Link>
-              <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-            </div>
-            <Link href="/projects/new">
-              <Button>New Project</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
+      <Navbar user={user} />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
+          <Link href="/projects/new">
+            <Button>Create Project</Button>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 gap-6">
           {projects.length === 0 ? (
             <Card>

@@ -14,6 +14,7 @@ interface ReceiptReviewModalProps {
     total?: number;
     date?: string;
     category?: string;
+    categoryId?: number | null;
     projectId?: number | null;
     description?: string;
   };
@@ -28,8 +29,10 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
     expenseDate: initialData.date || new Date().toISOString().split("T")[0],
     description: initialData.description || "",
     projectId: initialData.projectId?.toString() || "",
+    categoryId: initialData.categoryId?.toString() || "",
   });
   const [projects, setProjects] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +50,28 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/expenses/categories");
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+          
+          // If we have a category name from AI but no ID, try to match it
+          if (!formData.categoryId && initialData.category) {
+            const match = data.find((c: any) => 
+              c.name.toLowerCase() === initialData.category?.toLowerCase()
+            );
+            if (match) {
+              setFormData(prev => ({ ...prev, categoryId: match.id.toString() }));
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    };
+
     const fetchReceiptUrl = async () => {
       try {
         const response = await fetch(`/api/expenses/${expenseId}/receipt`);
@@ -60,8 +85,9 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
     };
 
     fetchProjects();
+    fetchCategories();
     fetchReceiptUrl();
-  }, [expenseId]);
+  }, [expenseId, initialData.category]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -73,6 +99,7 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
         body: JSON.stringify({
           ...formData,
           projectId: formData.projectId || null,
+          categoryId: formData.categoryId || null,
         }),
       });
 
@@ -143,6 +170,7 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
                   <Label htmlFor="project">Project (Optional)</Label>
                   <select
                     id="project"
+                    name="projectId"
                     className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={formData.projectId}
                     onChange={(e) => setFormData({ ...formData, projectId: e.target.value })}
@@ -155,6 +183,24 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <select
+                  id="category"
+                  name="categoryId"
+                  className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.categoryId}
+                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                >
+                  <option value="">Uncategorized</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-2">

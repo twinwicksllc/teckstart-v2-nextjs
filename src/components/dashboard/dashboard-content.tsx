@@ -1,9 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
+import { Navbar } from "@/components/navbar";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface User {
   id: number;
@@ -53,14 +64,22 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   const aiProcessedCount = expenses.filter(e => e.aiParsed).length;
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  // Prepare chart data for dashboard (last 6 months)
+  const last6Months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    return d.toISOString().split("-").slice(0, 2).join("-");
+  }).reverse();
+
+  const chartData = last6Months.map(month => {
+    const monthExpenses = expenses.filter(e => 
+      new Date(e.expenseDate).toISOString().startsWith(month)
+    );
+    return {
+      name: new Date(month + "-01").toLocaleString('default', { month: 'short' }),
+      amount: monthExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0)
+    };
+  });
 
   if (loading) {
     return (
@@ -75,19 +94,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Welcome, {user.name || user.email}</span>
-              <Button variant="outline" onClick={handleLogout}>
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Navbar user={user} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -115,7 +122,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Tax Deductions</CardTitle>
             </CardHeader>
@@ -127,7 +134,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Receipts Processed</CardTitle>
             </CardHeader>
@@ -154,6 +161,24 @@ export function DashboardContent({ user }: DashboardContentProps) {
           </Card>
 
           <div className="lg:col-span-2 space-y-8">
+            <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => window.location.href = "/analytics"}>
+              <CardHeader>
+                <CardTitle>Monthly Spending Trend</CardTitle>
+                <CardDescription>Your expenses over the last 6 months</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
