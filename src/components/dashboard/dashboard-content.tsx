@@ -17,8 +17,8 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ user }: DashboardContentProps) {
-  const [projects, setProjects] = useState([]);
-  const [expenses, setExpenses] = useState([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,6 +45,13 @@ export function DashboardContent({ user }: DashboardContentProps) {
       setLoading(false);
     }
   };
+
+  // Calculate stats
+  const totalDeductions = expenses
+    .filter(e => e.isDeductible)
+    .reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
+
+  const aiProcessedCount = expenses.filter(e => e.aiParsed).length;
 
   const handleLogout = async () => {
     try {
@@ -84,7 +91,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/projects"}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
             </CardHeader>
@@ -96,7 +103,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/expenses"}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
             </CardHeader>
@@ -113,7 +120,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
               <CardTitle className="text-sm font-medium">Tax Deductions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$0</div>
+              <div className="text-2xl font-bold">${totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               <p className="text-xs text-muted-foreground">
                 Potential savings
               </p>
@@ -125,7 +132,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
               <CardTitle className="text-sm font-medium">Receipts Processed</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{aiProcessedCount}</div>
               <p className="text-xs text-muted-foreground">
                 AI-processed
               </p>
@@ -148,11 +155,16 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
           <div className="lg:col-span-2 space-y-8">
             <Card>
-              <CardHeader>
-                <CardTitle>Recent Projects</CardTitle>
-                <CardDescription>
-                  Your latest freelance projects
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Recent Projects</CardTitle>
+                  <CardDescription>
+                    Your latest freelance projects
+                  </CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => window.location.href = "/projects"}>
+                  View All
+                </Button>
               </CardHeader>
               <CardContent>
                 {projects.length === 0 ? (
@@ -165,7 +177,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 ) : (
                   <div className="space-y-4">
                     {projects.slice(0, 5).map((project: any) => (
-                      <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/projects"}>
                         <div>
                           <h3 className="font-medium">{project.name}</h3>
                           <p className="text-sm text-gray-500">{project.clientName}</p>
@@ -182,11 +194,16 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Recent Expenses</CardTitle>
-                <CardDescription>
-                  Your latest expense entries
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Recent Expenses</CardTitle>
+                  <CardDescription>
+                    Your latest expense entries
+                  </CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => window.location.href = "/expenses"}>
+                  View All
+                </Button>
               </CardHeader>
               <CardContent>
                 {expenses.length === 0 ? (
@@ -199,7 +216,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 ) : (
                   <div className="space-y-4">
                     {expenses.slice(0, 5).map((expense: any) => (
-                      <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/expenses"}>
                         <div>
                           <h3 className="font-medium">{expense.vendor}</h3>
                           <p className="text-sm text-gray-500">{expense.description}</p>

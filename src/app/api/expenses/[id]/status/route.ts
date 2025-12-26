@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { receiptId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await getServerSession();
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const receiptId = parseInt(params.receiptId, 10);
+    const receiptId = parseInt(params.id, 10);
 
     if (isNaN(receiptId)) {
       return NextResponse.json(
@@ -46,6 +46,7 @@ export async function GET(
     // Map receipt status to user-friendly response
     const response: any = {
       id: receipt.id,
+      expenseId: receipt.expenseId,
       status: receipt.status,
       fileName: receipt.fileName,
       uploadedAt: receipt.uploadedAt,
@@ -57,8 +58,10 @@ export async function GET(
     } else if (receipt.status === "completed") {
       response.message = "Receipt parsed successfully";
       response.data = {
-        merchantName: receipt.merchantName,
-        vendorName: receipt.vendorName,
+        merchantName: receipt.merchantName || receipt.normalizedData?.merchantName,
+        total: receipt.normalizedData?.total,
+        date: receipt.normalizedData?.date,
+        category: receipt.normalizedData?.category,
         confidenceScore: receipt.confidenceScore,
         normalizedData: receipt.normalizedData,
       };

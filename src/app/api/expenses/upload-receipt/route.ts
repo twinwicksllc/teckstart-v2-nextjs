@@ -4,6 +4,7 @@ import { uploadReceiptToS3 } from "@/lib/s3";
 import { db } from "@/lib/db";
 import { receipts } from "@/drizzle.schema";
 import { processReceiptWithAI } from "@/lib/receipt-processor";
+import { eq, and, gte } from "drizzle-orm";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
@@ -32,6 +33,34 @@ export async function POST(request: NextRequest) {
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     const fileType = file.type;
     const fileName = file.name;
+    const fileSize = fileBuffer.length;
+
+    // Check for duplicate upload (same name and size for this user in the last 24 hours)
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [existingReceipt] = await db
+      .select()
+      .from(receipts)
+      .where(
+        and(
+          eq(receipts.userId, user.id),
+          eq(receipts.fileName, fileName),
+          eq(receipts.fileSize, fileSize),
+          gte(receipts.createdAt, oneDayAgo)
+        )
+      )
+      .limit(1);
+
+    if (existingReceipt) {
+      return NextResponse.json(
+        { 
+          error: "Duplicate upload detected", 
+          message: "You already uploaded this file recently.",
+          receiptId: existingReceipt.id,
+          status: existingReceipt.status
+        },
+        { status: 409 }
+      );
+    }
 
     // Upload to S3 with compression
     const uploadResult = await uploadReceiptToS3({

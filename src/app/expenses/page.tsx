@@ -1,0 +1,160 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
+
+export default function ExpensesPage() {
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingExpense, setEditingExpense] = useState<any>(null);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await fetch("/api/expenses");
+      if (response.ok) {
+        const data = await response.json();
+        setExpenses(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch expenses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this expense?")) return;
+
+    try {
+      const response = await fetch(`/api/expenses/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        setExpenses(expenses.filter(e => e.id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">
+                &larr; Back to Dashboard
+              </Link>
+              <h1 className="text-3xl font-bold text-gray-900">Expenses</h1>
+            </div>
+            <Link href="/expenses/new">
+              <Button>Add Expense</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <ul className="divide-y divide-gray-200">
+            {expenses.length === 0 ? (
+              <li className="px-6 py-12 text-center">
+                <p className="text-gray-500 mb-4">No expenses found.</p>
+                <Link href="/expenses/new">
+                  <Button>Add Your First Expense</Button>
+                </Link>
+              </li>
+            ) : (
+              expenses.map((expense) => (
+                <li key={expense.id}>
+                  <div className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <p className="text-sm font-medium text-blue-600 truncate">
+                          {expense.vendor}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {expense.projectId ? `Project ID: ${expense.projectId}` : "General Business Expense"}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <p className="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          ${expense.amount}
+                        </p>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setEditingExpense(expense)}
+                          >
+                            Edit
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDelete(expense.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2 sm:flex sm:justify-between">
+                      <div className="sm:flex">
+                        <p className="flex items-center text-sm text-gray-500">
+                          {expense.description || "No description"}
+                        </p>
+                      </div>
+                      <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                        <p>
+                          {new Date(expense.expenseDate).toLocaleDateString()}
+                        </p>
+                        {expense.aiParsed && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                            AI Parsed
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+      </div>
+
+      {editingExpense && (
+        <ReceiptReviewModal
+          expenseId={editingExpense.id}
+          initialData={{
+            merchantName: editingExpense.vendor,
+            total: parseFloat(editingExpense.amount),
+            date: new Date(editingExpense.expenseDate).toISOString().split("T")[0],
+            description: editingExpense.description,
+            projectId: editingExpense.projectId,
+          }}
+          onClose={() => setEditingExpense(null)}
+          onSave={() => {
+            setEditingExpense(null);
+            fetchExpenses();
+          }}
+        />
+      )}
+    </div>
+  );
+}

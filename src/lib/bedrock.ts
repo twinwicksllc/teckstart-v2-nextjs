@@ -81,7 +81,6 @@ Respond with only the JSON object.`;
           type: "base64" as const,
           media_type: "application/pdf" as const,
           data: imageBase64,
-          name: fileName.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50) || "receipt",
         },
       });
     } else {
@@ -170,7 +169,6 @@ export async function parseReceiptWithHaiku(
           type: "base64" as const,
           media_type: "application/pdf" as const,
           data: imageBase64,
-          name: fileName.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50) || "receipt",
         },
       });
     } else {

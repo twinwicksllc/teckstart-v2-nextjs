@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { receipts, expenses } from "@/drizzle.schema";
 import { parseReceiptWithBedrock, parseReceiptWithHaiku, ParsedReceipt } from "@/lib/bedrock";
-import { eq } from "drizzle-orm";
+import { eq, and, desc, isNotNull } from "drizzle-orm";
 
 export interface ProcessReceiptOptions {
   receiptId: number;
@@ -53,6 +53,22 @@ export async function processReceiptWithAI(options: ProcessReceiptOptions): Prom
         updatedAt: new Date(),
       })
       .where(eq(receipts.id, receiptId));
+
+    // Check for similar receipts from this user to potentially skip AI or improve accuracy
+    // (e.g., same filename or same vendor if we had it)
+    const [similarReceipt] = await db
+      .select()
+      .from(receipts)
+      .where(
+        and(
+          eq(receipts.userId, userId),
+          eq(receipts.fileName, fileName),
+          eq(receipts.status, "completed"),
+          isNotNull(receipts.normalizedData)
+        )
+      )
+      .orderBy(desc(receipts.createdAt))
+      .limit(1);
 
     // Try Sonnet first for best quality
     let parsedData: ParsedReceipt;
@@ -178,6 +194,7 @@ export async function processReceiptWithAI(options: ProcessReceiptOptions): Prom
       await db
         .update(receipts)
         .set({
+          status: "failed", // Set to failed so UI knows it's not processing
           retryCount: newRetryCount,
           lastError: errorMessage,
           updatedAt: new Date(),

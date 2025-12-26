@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ReceiptReviewModal } from "./receipt-review-modal";
 
 interface UploadResult {
   success: boolean;
@@ -22,6 +23,8 @@ export function ReceiptUploadForm() {
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [processingStatus, setProcessingStatus] = useState<string>("");
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewData, setReviewData] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +87,13 @@ export function ReceiptUploadForm() {
             success: true,
             message: `Merchant: ${data.data?.merchantName || "Unknown"}`,
           });
+          
+          // Show review modal
+          setReviewData({
+            expenseId: data.expenseId,
+            data: data.data
+          });
+          setShowReviewModal(true);
           return true;
         } else if (data.status === "failed") {
           setProcessingStatus(`❌ Parsing failed: ${data.error}`);
@@ -134,6 +144,12 @@ export function ReceiptUploadForm() {
         setProcessingStatus("⏳ Analyzing receipt...");
 
         // Start polling for status
+        if (data.receiptId) {
+          pollReceiptStatus(data.receiptId);
+        }
+      } else if (response.status === 409) {
+        // Duplicate detected
+        setProcessingStatus("ℹ️ Duplicate detected. Using existing data.");
         if (data.receiptId) {
           pollReceiptStatus(data.receiptId);
         }
@@ -243,6 +259,20 @@ export function ReceiptUploadForm() {
           </div>
         )}
       </div>
+
+      {showReviewModal && reviewData && (
+        <ReceiptReviewModal
+          expenseId={reviewData.expenseId}
+          initialData={reviewData.data}
+          onClose={() => setShowReviewModal(false)}
+          onSave={() => {
+            setShowReviewModal(false);
+            setProcessingStatus("✅ Expense saved and updated!");
+            // Optionally refresh dashboard data here if needed
+            window.location.reload(); // Simple way to refresh everything
+          }}
+        />
+      )}
     </Card>
   );
 }
