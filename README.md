@@ -1,3 +1,38 @@
+
+## **DB & Health Scripts**
+- **Prereq:** Ensure `.env.local` contains `DATABASE_URL`, `AWS_REGION`, and `S3_BUCKET_NAME` or `AWS_S3_BUCKET`.
+- **List Tables:** Shows all public tables in Neon.
+   - Command:
+      ```bash
+      node scripts/list-tables.mjs
+      ```
+- **Check Receipts Table:** Verifies existence of the `receipts` table.
+   - Command:
+      ```bash
+      node scripts/check-receipts.mjs
+      ```
+   - Expected output: `{ receiptsExists: true }`
+- **Create Receipts Schema (safe/idempotent):** Creates enum, table, indexes, and FK.
+   - Command:
+      ```bash
+      node scripts/create-receipts.mjs
+      ```
+- **Run SQL Migration:** Applies `drizzle/migrations/0002_add_receipts_table.sql` if you prefer raw SQL.
+   - Command:
+      ```bash
+      node scripts/migrate-receipts.mjs
+      ```
+- **Health Endpoint:** Checks envs, DB connectivity, and table presence.
+   - Local:
+      ```bash
+      curl -sS http://localhost:3000/api/admin/db/health | jq
+      ```
+   - Vercel:
+      ```bash
+      curl -sS https://<your-app>.vercel.app/api/admin/db/health | jq
+      ```
+   - Status should be `ok`; `degraded` indicates missing envs or tables.
+
 # TeckStart v2 - Next.js Version
 
 **Status:** 🚧 Under Development  
