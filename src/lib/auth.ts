@@ -68,7 +68,7 @@ export async function authenticateUser(email: string, password: string): Promise
   try {
     const command = new InitiateAuthCommand({
       AuthFlow: "USER_PASSWORD_AUTH",
-      ClientId: process.env.COGNITO_CLIENT_ID!,
+      ClientId: process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID!,
       AuthParameters: {
         USERNAME: email,
         PASSWORD: password,
@@ -128,7 +128,10 @@ export async function authenticateUser(email: string, password: string): Promise
 
     return { success: false, error: "Authentication failed" };
   } catch (error) {
-    console.error("Authentication error:", error);
+    console.error("Cognito authentication error:", error);
+    if (error instanceof Error) {
+      return { success: false, error: error.message };
+    }
     return { success: false, error: "Authentication failed" };
   }
 }

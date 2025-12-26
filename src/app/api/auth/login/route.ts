@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("Login attempt for:", email);
     const result = await authenticateUser(email, password);
+    console.log("Auth result:", { success: result.success, error: result.error });
 
     if (result.success && result.user && result.token) {
       // Create session cookie
