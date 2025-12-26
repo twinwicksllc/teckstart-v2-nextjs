@@ -173,6 +173,8 @@ export const userPreferences = pgTable("userPreferences", {
   awsAccountId: varchar("awsAccountId", { length: 12 }),
   awsAccessKeyId: varchar("awsAccessKeyId", { length: 128 }),
   awsSecretAccessKey: text("awsSecretAccessKey"), // Encrypted in production
+  awsRegion: varchar("awsRegion", { length: 50 }).default("us-east-1").notNull(),
+  awsLastRetrievedAt: timestamp("awsLastRetrievedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
