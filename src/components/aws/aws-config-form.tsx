@@ -14,6 +14,7 @@ export function AWSConfigForm() {
   const [configured, setConfigured] = useState(false);
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [syncMonths, setSyncMonths] = useState(1);
 
   useEffect(() => {
     fetchConfig();
@@ -67,10 +68,19 @@ export function AWSConfigForm() {
   const handleSync = async () => {
     setSyncing(true);
     try {
+      // Calculate start date based on selected months
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - syncMonths);
+      startDate.setDate(1); // Start from the 1st of that month
+
       const res = await fetch("/api/aws/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // Use defaults
+        body: JSON.stringify({
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0]
+        }),
       });
       
       if (res.ok) {
@@ -136,12 +146,28 @@ export function AWSConfigForm() {
           </form>
 
           {configured && (
-            <div className="mt-6 pt-6 border-t">
-              <div className="flex items-center justify-between mb-4">
+            <div className="mt-6 pt-6 border-t space-y-4">
+              <div className="flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
                   Last synced: {lastSynced ? new Date(lastSynced).toLocaleString() : "Never"}
                 </div>
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="syncMonths">Sync Duration</Label>
+                <select
+                  id="syncMonths"
+                  value={syncMonths}
+                  onChange={(e) => setSyncMonths(Number(e.target.value))}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value={1}>Last 1 Month</option>
+                  <option value={3}>Last 3 Months</option>
+                  <option value={6}>Last 6 Months</option>
+                  <option value={12}>Last 12 Months</option>
+                </select>
+              </div>
+
               <Button 
                 variant="outline" 
                 className="w-full" 
