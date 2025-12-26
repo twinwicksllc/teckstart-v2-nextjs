@@ -169,7 +169,7 @@ export function ReceiptUploadForm() {
               ref={fileInputRef}
               id="receipt"
               type="file"
-              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,application/pdf"
               onChange={handleFileChange}
               className="hidden"
             />
@@ -179,6 +179,11 @@ export function ReceiptUploadForm() {
                 <p className="text-xs text-gray-500 mt-1">
                   {(file.size / 1024 / 1024).toFixed(2)} MB
                 </p>
+                {file.type === "application/pdf" && (
+                  <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-600">
+                    PDF Document Selected
+                  </div>
+                )}
               </div>
             ) : (
               <div>
@@ -186,7 +191,7 @@ export function ReceiptUploadForm() {
                   Drag & drop receipt here or click to browse
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Supports: JPG, PNG, GIF, WebP (max 50MB)
+                  Supports: JPG, PNG, GIF, WebP, PDF (max 50MB)
                 </p>
               </div>
             )}

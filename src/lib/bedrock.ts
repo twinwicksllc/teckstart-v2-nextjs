@@ -65,22 +65,39 @@ Important rules:
 Respond with only the JSON object.`;
 
   try {
+    const isPdf = imageMediaType === "application/pdf";
+    
+    const content: any[] = [
+      {
+        type: "text" as const,
+        text: prompt,
+      },
+    ];
+
+    if (isPdf) {
+      content.unshift({
+        type: "document" as const,
+        source: {
+          type: "base64" as const,
+          media_type: "application/pdf" as const,
+          data: imageBase64,
+          name: fileName.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50) || "receipt",
+        },
+      });
+    } else {
+      content.unshift({
+        type: "image" as const,
+        source: {
+          type: "base64" as const,
+          media_type: imageMediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+          data: imageBase64,
+        },
+      });
+    }
+
     const message = {
       role: "user" as const,
-      content: [
-        {
-          type: "image" as const,
-          source: {
-            type: "base64" as const,
-            media_type: imageMediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
-            data: imageBase64,
-          },
-        },
-        {
-          type: "text" as const,
-          text: prompt,
-        },
-      ],
+      content,
     };
 
     const command = new InvokeModelCommand({
@@ -137,22 +154,39 @@ export async function parseReceiptWithHaiku(
   const prompt = `Extract receipt information as JSON: {merchantName, date (YYYY-MM-DD), total (number), tax (number or null), currency, category, isTaxable (boolean), lineItems (array of {description, quantity, unitPrice, amount})}. Return only valid JSON.`;
 
   try {
+    const isPdf = imageMediaType === "application/pdf";
+    
+    const content: any[] = [
+      {
+        type: "text" as const,
+        text: prompt,
+      },
+    ];
+
+    if (isPdf) {
+      content.unshift({
+        type: "document" as const,
+        source: {
+          type: "base64" as const,
+          media_type: "application/pdf" as const,
+          data: imageBase64,
+          name: fileName.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50) || "receipt",
+        },
+      });
+    } else {
+      content.unshift({
+        type: "image" as const,
+        source: {
+          type: "base64" as const,
+          media_type: imageMediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+          data: imageBase64,
+        },
+      });
+    }
+
     const message = {
       role: "user" as const,
-      content: [
-        {
-          type: "image" as const,
-          source: {
-            type: "base64" as const,
-            media_type: imageMediaType as "image/jpeg" | "image/png" | "image/gif" | "image/webp",
-            data: imageBase64,
-          },
-        },
-        {
-          type: "text" as const,
-          text: prompt,
-        },
-      ],
+      content,
     };
 
     const command = new InvokeModelCommand({

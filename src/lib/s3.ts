@@ -35,14 +35,6 @@ export function validateReceiptFile(fileBuffer: Buffer, fileType: string): { val
     };
   }
 
-  // Reject multi-page PDFs
-  if (fileType === "application/pdf") {
-    return {
-      valid: false,
-      error: "Multi-page PDFs are not supported in this version. Please convert to individual images or upload one page at a time.",
-    };
-  }
-
   // Supported types
   const supportedTypes = [
     "image/jpeg",
@@ -50,12 +42,13 @@ export function validateReceiptFile(fileBuffer: Buffer, fileType: string): { val
     "image/png",
     "image/gif",
     "image/webp",
+    "application/pdf",
   ];
 
   if (!supportedTypes.includes(fileType)) {
     return {
       valid: false,
-      error: `Unsupported file type: ${fileType}. Supported types: JPG, PNG, GIF, WebP.`,
+      error: `Unsupported file type: ${fileType}. Supported types: JPG, PNG, GIF, WebP, PDF.`,
     };
   }
 
