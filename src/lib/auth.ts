@@ -68,7 +68,7 @@ export async function authenticateUser(email: string, password: string): Promise
   try {
     const command = new InitiateAuthCommand({
       AuthFlow: "USER_PASSWORD_AUTH",
-      ClientId: process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID!,
+      ClientId: (process.env.AWS_COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID)!,
       AuthParameters: {
         USERNAME: email,
         PASSWORD: password,
@@ -161,7 +161,7 @@ export async function destroySession(): Promise<void> {
 export async function registerUser(email: string, password: string): Promise<{ success: boolean; error?: string }> {
   try {
     const command = new SignUpCommand({
-      ClientId: process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID!,
+      ClientId: (process.env.AWS_COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID)!,
       Username: email,
       Password: password,
       UserAttributes: [

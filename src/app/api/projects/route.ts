@@ -3,7 +3,7 @@ import { getServerSession } from "@/lib/auth";
 import { withDatabase } from "@/lib/db";
 import { db } from "@/lib/db";
 import { projects } from "@/drizzle.schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
   try {

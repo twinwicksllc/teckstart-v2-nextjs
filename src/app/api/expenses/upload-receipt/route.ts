@@ -4,6 +4,7 @@ import { uploadReceiptToS3 } from "@/lib/s3";
 import { db } from "@/lib/db";
 import { receipts } from "@/drizzle.schema";
 import { processReceiptWithAI } from "@/lib/receipt-processor";
+export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {

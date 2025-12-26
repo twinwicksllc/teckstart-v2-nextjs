@@ -1,11 +1,12 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || "us-east-1",
 });
 
-const BUCKET_NAME = process.env.AWS_S3_BUCKET || "teckstart.com";
+const BUCKET_NAME =
+  process.env.S3_BUCKET_NAME || process.env.AWS_S3_BUCKET || "teckstart.com";
 const RECEIPTS_PREFIX = "receipts";
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 

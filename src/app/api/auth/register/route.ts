@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { registerUser } from "@/lib/auth";
+export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {

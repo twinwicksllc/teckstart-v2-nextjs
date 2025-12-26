@@ -4,6 +4,7 @@ import { users, projects, expenses, receipts } from "@/drizzle.schema";
 import { eq, sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET() {
   const startedAt = Date.now();
@@ -11,7 +12,7 @@ export async function GET() {
   const requiredEnv = [
     "DATABASE_URL",
     "AWS_REGION",
-    "AWS_S3_BUCKET",
+    "S3_BUCKET_NAME",
   ];
 
   const envStatus: Record<string, boolean> = {};

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
-import { getReceiptById } from "@/lib/receipt-processor";
 import { db } from "@/lib/db";
 import { receipts } from "@/drizzle.schema";
 import { eq, and } from "drizzle-orm";
+export const runtime = "nodejs";
 
 export async function GET(
   request: NextRequest,

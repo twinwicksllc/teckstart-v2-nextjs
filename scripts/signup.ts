@@ -11,7 +11,7 @@ const client = new CognitoIdentityProviderClient({
 async function signUp(email: string, password: string) {
   try {
     const command = new SignUpCommand({
-      ClientId: process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID,
+      ClientId: process.env.AWS_COGNITO_CLIENT_ID || process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID,
       Username: email,
       Password: password,
       UserAttributes: [
