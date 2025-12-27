@@ -1,4 +1,4 @@
-import { serial, pgTable, text, timestamp, varchar, decimal, jsonb, boolean, index, pgEnum, integer } from "drizzle-orm/pg-core";
+import { serial, pgTable, text, timestamp, varchar, decimal, jsonb, boolean, index, uniqueIndex, pgEnum, integer } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["user", "admin"]);
 export const projectStatusEnum = pgEnum("project_status", ["active", "completed", "on_hold", "cancelled"]);
@@ -104,6 +104,7 @@ export const expenses = pgTable("expenses", {
   expenseDateIdx: index("expenses_expenseDate_idx").on(table.expenseDate),
   fingerprintIdx: index("expenses_fingerprint_idx").on(table.fingerprint),
   sourceIdx: index("expenses_source_idx").on(table.source),
+  fingerprintUnique: uniqueIndex("expenses_fingerprint_unique").on(table.fingerprint),
 }));
 
 export type Expense = typeof expenses.$inferSelect;
