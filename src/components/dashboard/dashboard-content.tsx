@@ -217,12 +217,22 @@ export function DashboardContent({ user }: DashboardContentProps) {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip 
-                      formatter={(value: number, name: string) => [
-                        `$${Number(value).toFixed(2)}`,
-                        name === 'income' ? 'Income' : name === 'expenses' ? 'Expenses' : 'Profit'
-                      ]}
+                      formatter={(value: number, name: string) => {
+                        const label = name === 'income' || name === 'Income'
+                          ? 'Income'
+                          : name === 'expenses' || name === 'Expenses'
+                          ? 'Expenses'
+                          : 'Profit';
+                        return [`$${Number(value || 0).toFixed(2)}`, label];
+                      }}
                     />
-                    <Legend />
+                    <Legend
+                      formatter={(value: string) => {
+                        if (value === 'income' || value === 'Income') return 'Income';
+                        if (value === 'expenses' || value === 'Expenses') return 'Expenses';
+                        return value;
+                      }}
+                    />
                     <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
                     <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
                   </BarChart>
