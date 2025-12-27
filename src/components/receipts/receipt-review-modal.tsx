@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Project, ExpenseCategory } from "@/drizzle.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ZoomIn, ZoomOut, RotateCw, RefreshCw, ExternalLink } from "lucide-react";
 
 interface ReceiptReviewModalProps {
   expenseId: number;
@@ -37,6 +38,13 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.5, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.5, 0.5));
+  const handleRotate = () => setRotation(prev => (prev + 90) % 360);
+  const handleReset = () => { setZoom(1); setRotation(0); };
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -218,23 +226,51 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
 
             {/* Receipt Image Column */}
             {receiptUrl && (
-              <div className="border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center min-h-[300px]">
-                {receiptUrl.toLowerCase().includes('.pdf') ? (
-                  <iframe 
-                    src={receiptUrl} 
-                    className="w-full h-full min-h-[400px]"
-                    title="Receipt PDF"
-                  />
-                ) : (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-end space-x-2 mb-2">
+                  <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoom <= 0.5} type="button" title="Zoom Out">
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm w-12 text-center">{Math.round(zoom * 100)}%</span>
+                  <Button variant="outline" size="icon" onClick={handleZoomIn} disabled={zoom >= 3} type="button" title="Zoom In">
+                    <ZoomIn className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={handleRotate} type="button" title="Rotate">
+                    <RotateCw className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={handleReset} type="button" title="Reset">
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={() => window.open(receiptUrl, '_blank')} type="button" title="Open in New Tab">
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center min-h-[300px] relative">
+                  {receiptUrl.toLowerCase().includes('.pdf') ? (
+                    <iframe 
                       src={receiptUrl} 
-                      alt="Receipt" 
-                      className="max-w-full max-h-full object-contain"
+                      className="w-full h-full min-h-[400px]"
+                      title="Receipt PDF"
                     />
-                  </>
-                )}
+                  ) : (
+                    <div 
+                      className="transition-transform duration-200 ease-in-out flex items-center justify-center"
+                      style={{ 
+                        transform: `scale(${zoom}) rotate(${rotation}deg)`,
+                        width: '100%',
+                        height: '100%'
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={receiptUrl} 
+                        alt="Receipt" 
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
