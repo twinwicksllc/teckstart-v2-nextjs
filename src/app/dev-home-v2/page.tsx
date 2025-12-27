@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +9,16 @@ import {
   Sparkles, 
   ArrowRight, 
   CheckCircle2,
+  Zap,
   Shield,
   TrendingUp
 } from "lucide-react";
 
 export default function HomePage() {
+  if (process.env.NODE_ENV !== "development") {
+    notFound();
+  }
+
   return (
     <div className="min-h-screen text-zinc-50 bg-slate-200">
       <div className="relative z-10">
