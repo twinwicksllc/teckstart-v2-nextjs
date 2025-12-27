@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
     const categoryId = searchParams.get("categoryId");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
+    const vendor = searchParams.get("vendor");
 
     // Build expense where clause
     let expenseWhereClause: SQL | undefined = eq(expenses.userId, user.id);
@@ -26,6 +27,9 @@ export async function GET(request: NextRequest) {
     }
     if (categoryId) {
       expenseWhereClause = and(expenseWhereClause, eq(expenses.categoryId, parseInt(categoryId)));
+    }
+    if (vendor) {
+      expenseWhereClause = and(expenseWhereClause, eq(expenses.vendor, vendor));
     }
     if (startDate) {
       expenseWhereClause = and(expenseWhereClause, gte(expenses.expenseDate, new Date(startDate)));
@@ -128,6 +132,12 @@ export async function GET(request: NextRequest) {
       .orderBy(sql`sum(${expenses.amount}) desc`)
       .limit(5);
 
+    // 4b. Vendor options (distinct for filter)
+    const vendorOptions = await db
+      .selectDistinct({ name: expenses.vendor })
+      .from(expenses)
+      .where(eq(expenses.userId, user.id));
+
     // 5. Total summaries
     const totalExpenseResult = await db
       .select({ total: sql<string>`COALESCE(SUM(${expenses.amount}), 0)` })
@@ -148,6 +158,7 @@ export async function GET(request: NextRequest) {
       monthly: monthlyData,
       byProject: projectData.map(d => ({ ...d, amount: parseFloat(String(d.amount)) || 0, name: d.name || "General" })),
       byVendor: vendorData.map(d => ({ ...d, amount: parseFloat(String(d.amount)) || 0 })),
+      vendorOptions: vendorOptions.map(v => v.name).filter(Boolean),
       summary: {
         totalExpenses,
         totalIncome,

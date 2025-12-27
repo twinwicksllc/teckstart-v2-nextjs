@@ -67,9 +67,11 @@ export default function AnalyticsPage() {
   const [filters, setFilters] = useState({
     projectId: "",
     categoryId: "",
+    vendor: "",
     startDate: "",
     endDate: "",
   });
+  const [vendorOptions, setVendorOptions] = useState<string[]>([]);
 
   useEffect(() => {
     fetchFilters();
@@ -109,12 +111,17 @@ export default function AnalyticsPage() {
       const params = new URLSearchParams();
       if (filters.projectId) params.append("projectId", filters.projectId);
       if (filters.categoryId) params.append("categoryId", filters.categoryId);
+      if (filters.vendor) params.append("vendor", filters.vendor);
       if (filters.startDate) params.append("startDate", filters.startDate);
       if (filters.endDate) params.append("endDate", filters.endDate);
 
       const response = await fetch(`/api/analytics?${params.toString()}`);
       if (response.ok) {
-        setData(await response.json());
+        const json = await response.json();
+        setData(json);
+        if (json.vendorOptions) {
+          setVendorOptions(json.vendorOptions);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch analytics:", err);
@@ -135,6 +142,7 @@ export default function AnalyticsPage() {
     setFilters({
       projectId: "",
       categoryId: "",
+      vendor: "",
       startDate: "",
       endDate: "",
     });
@@ -190,6 +198,20 @@ export default function AnalyticsPage() {
                   <option value="">All Categories</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Vendor</Label>
+                <select
+                  name="vendor"
+                  className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm"
+                  value={filters.vendor}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All Vendors</option>
+                  {vendorOptions.map((v) => (
+                    <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
               </div>
