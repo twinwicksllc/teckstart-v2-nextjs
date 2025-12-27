@@ -27,6 +27,7 @@ export async function GET() {
         projectId: expenses.projectId,
         projectName: projects.name,
         aiParsed: expenses.aiParsed,
+        isDeductible: expenses.isDeductible,
       })
         .from(expenses)
         .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
