@@ -19,10 +19,22 @@ export async function POST(req: NextRequest) {
 
     await syncAWSExpenses(session.id, start, end);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, window: { start, end } });
   } catch (error) {
     console.error("Error syncing AWS expenses:", error);
     const message = error instanceof Error ? error.message : "Sync failed";
+
+    // Map known failures to clearer status codes
+    if (message.includes("AWS Config not found")) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    if (message.includes("decryption failed")) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    if (message.includes("AWS Cost Explorer error")) {
+      return NextResponse.json({ error: message }, { status: 502 });
+    }
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

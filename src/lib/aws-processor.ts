@@ -35,17 +35,31 @@ export async function syncAWSExpenses(userId: number, startDate: string, endDate
 
   if (!config) throw new Error("AWS Config not found");
 
-  const accessKeyId = decrypt(config.awsAccessKeyId);
-  const secretAccessKey = decrypt(config.awsSecretAccessKey);
+  // Decrypt credentials; surface clear error if key mismatch
+  let accessKeyId: string;
+  let secretAccessKey: string;
+  try {
+    accessKeyId = decrypt(config.awsAccessKeyId);
+    secretAccessKey = decrypt(config.awsSecretAccessKey);
+  } catch (e) {
+    console.error("AWS config decryption failed:", e);
+    throw new Error("Invalid AWS configuration: decryption failed. Ensure ENCRYPTION_KEY matches the key used to save credentials.");
+  }
 
   // 2. Fetch Data
-  const dailyCosts = await fetchDailyCosts({
-    accessKeyId,
-    secretAccessKey,
-    region: config.awsRegion,
-    startDate,
-    endDate
-  });
+  let dailyCosts;
+  try {
+    dailyCosts = await fetchDailyCosts({
+      accessKeyId,
+      secretAccessKey,
+      region: config.awsRegion,
+      startDate,
+      endDate
+    });
+  } catch (e) {
+    console.error("AWS Cost Explorer fetch failed:", e);
+    throw new Error("AWS Cost Explorer error: verify credentials/permissions and region.");
+  }
 
   // 3. Aggregate by Service + Month
   const aggregated = new Map<string, {
