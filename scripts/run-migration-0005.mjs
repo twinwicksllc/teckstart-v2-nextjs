@@ -17,7 +17,7 @@ async function main() {
   const migrationSQL = fs.readFileSync(migrationPath, "utf8");
 
   console.log("Running migration: 0005_add_expenses_fingerprint_unique.sql");
-  await sql(migrationSQL);
+  await sql.query(migrationSQL);
   console.log("✅ Migration applied");
 }
 
