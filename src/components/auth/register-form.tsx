@@ -79,30 +79,11 @@ export function RegisterForm() {
       } else {
         setError(data.error || "Registration failed");
       }
-    } catch (error) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    const domain = process.env.NEXT_PUBLIC_COGNITO_DOMAIN;
-    const clientId = process.env.NEXT_PUBLIC_AWS_COGNITO_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_AUTH_CALLBACK_URL || `${window.location.origin}/api/auth/callback`;
-    
-    if (!domain || domain === "undefined") {
-      setError("Auth configuration is missing. Please check environment variables.");
-      console.error("Missing NEXT_PUBLIC_COGNITO_DOMAIN");
-      return;
-    }
-
-    // Ensure domain has protocol
-    const baseUrl = domain.startsWith("http") ? domain : `https://${domain}`;
-    const url = `${baseUrl}/oauth2/authorize?identity_provider=Google&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&client_id=${clientId}&scope=email+openid+profile`;
-    
-    console.log("Redirecting to Google login:", url);
-    window.location.href = url;
   };
 
   if (success) {

@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ReceiptReviewModal } from "./receipt-review-modal";
+import { ReceiptReviewModal } from "./receipt-review-modal";import { ParsedReceipt } from "@/lib/bedrock";
+
+interface ReviewData {
+  expenseId: number;
+  data: ParsedReceipt;
+}
 
 interface UploadResult {
   success: boolean;
@@ -24,7 +29,7 @@ export function ReceiptUploadForm() {
   const [result, setResult] = useState<UploadResult | null>(null);
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [reviewData, setReviewData] = useState<any>(null);
+  const [reviewData, setReviewData] = useState<ReviewData | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,6 +222,7 @@ export function ReceiptUploadForm() {
         {preview && (
           <div className="mt-4">
             <Label>Preview</Label>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={preview}
               alt="Receipt preview"

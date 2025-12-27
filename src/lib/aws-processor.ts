@@ -1,15 +1,10 @@
-import { fetchDailyCosts, AWSCostParams, DailyCost } from "./aws-cost";
+import { fetchDailyCosts } from "./aws-cost";
 import { db } from "./db";
 import { expenses, awsConfigs, expenseCategories } from "@/drizzle.schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { decrypt } from "./encryption";
-import { BedrockRuntimeClient, InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 
-const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.AWS_REGION || "us-east-1",
-});
-
-async function categorizeService(serviceName: string, amount: number): Promise<number | null> {
+async function categorizeService(serviceName: string): Promise<number | null> {
   // 1. Try to find an existing category
   // For now, let's default to "Software" or "Hosting" if they exist.
   // Or use Bedrock to guess.
@@ -94,7 +89,7 @@ export async function syncAWSExpenses(userId: number, startDate: string, endDate
   // Handle regular entries
   for (const entry of Array.from(aggregated.values())) {
     const fingerprint = `aws-${userId}-${entry.service}-${entry.month}`;
-    const categoryId = await categorizeService(entry.service, entry.amount);
+    const categoryId = await categorizeService(entry.service);
     
     // Calculate date as the first of the month (or last?)
     // Let's use the first of the month for the record date
@@ -128,7 +123,7 @@ export async function syncAWSExpenses(userId: number, startDate: string, endDate
       const fingerprint = `aws-${userId}-misc-${monthStr}`;
       const [year, month] = monthStr.split('-').map(Number);
       const expenseDate = new Date(year, month - 1, 1);
-      const categoryId = await categorizeService("Miscellaneous", amount);
+      const categoryId = await categorizeService("Miscellaneous");
 
       await db.insert(expenses).values({
         userId,

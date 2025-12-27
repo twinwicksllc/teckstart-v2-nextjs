@@ -1,17 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
 import { Navbar } from "@/components/navbar";
+import { Expense, User } from "@/drizzle.schema";
+
+interface ExpenseWithDetails extends Expense {
+  projectName?: string | null;
+  categoryName?: string | null;
+}
 
 export default function ExpensesPage() {
-  const [expenses, setExpenses] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
+  const [expenses, setExpenses] = useState<ExpenseWithDetails[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [editingExpense, setEditingExpense] = useState<ExpenseWithDetails | null>(null);
 
   useEffect(() => {
     fetchExpenses();
@@ -67,7 +72,7 @@ export default function ExpensesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar user={user} />
+      <Navbar user={user || undefined} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
@@ -175,7 +180,7 @@ export default function ExpensesPage() {
             merchantName: editingExpense.vendor,
             total: parseFloat(editingExpense.amount),
             date: new Date(editingExpense.expenseDate).toISOString().split("T")[0],
-            description: editingExpense.description,
+            description: editingExpense.description || undefined,
             projectId: editingExpense.projectId,
           }}
           onClose={() => setEditingExpense(null)}

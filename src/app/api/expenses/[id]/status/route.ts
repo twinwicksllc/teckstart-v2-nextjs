@@ -44,6 +44,7 @@ export async function GET(
     }
 
     // Map receipt status to user-friendly response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response: any = {
       id: receipt.id,
       expenseId: receipt.expenseId,

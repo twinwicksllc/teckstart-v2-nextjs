@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL("/login?error=token_exchange_failed", request.url));
     }
 
-    const { access_token, id_token } = tokens;
+    const { access_token } = tokens;
 
     // Get user info from Cognito
     console.log("Fetching user info...");

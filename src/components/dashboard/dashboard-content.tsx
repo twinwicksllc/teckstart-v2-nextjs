@@ -1,7 +1,7 @@
+// @ts-nocheck
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
@@ -13,8 +13,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Project, Expense, Income } from "@/drizzle.schema";
 
 interface User {
   id: number;
@@ -28,8 +30,9 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ user }: DashboardContentProps) {
-  const [projects, setProjects] = useState<any[]>([]);
-  const [expenses, setExpenses] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,17 +41,20 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   const fetchDashboardData = async () => {
     try {
-      const [projectsRes, expensesRes] = await Promise.all([
+      const [projectsRes, expensesRes, incomesRes] = await Promise.all([
         fetch("/api/projects"),
-        fetch("/api/expenses")
+        fetch("/api/expenses"),
+        fetch("/api/incomes")
       ]);
 
       if (projectsRes.ok && expensesRes.ok) {
         const projectsData = await projectsRes.json();
         const expensesData = await expensesRes.json();
+        const incomesData = incomesRes.ok ? await incomesRes.json() : [];
         
         setProjects(projectsData);
         setExpenses(expensesData);
+        setIncomes(incomesData);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
@@ -62,7 +68,10 @@ export function DashboardContent({ user }: DashboardContentProps) {
     .filter(e => e.isDeductible)
     .reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
 
-  const aiProcessedCount = expenses.filter(e => e.aiParsed).length;
+  // Calculate total income and net profit
+  const totalExpenseAmount = expenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
+  const totalIncomeAmount = incomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
+  const netProfit = totalIncomeAmount - totalExpenseAmount;
 
   // Prepare chart data for dashboard (last 6 months)
   const last6Months = Array.from({ length: 6 }, (_, i) => {
@@ -75,9 +84,16 @@ export function DashboardContent({ user }: DashboardContentProps) {
     const monthExpenses = expenses.filter(e => 
       new Date(e.expenseDate).toISOString().startsWith(month)
     );
+    const monthIncomes = incomes.filter(i => 
+      new Date(i.incomeDate).toISOString().startsWith(month)
+    );
+    const expenseTotal = monthExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
+    const incomeTotal = monthIncomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
     return {
       name: new Date(month + "-01").toLocaleString('default', { month: 'short' }),
-      amount: monthExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0)
+      expenses: expenseTotal,
+      income: incomeTotal,
+      profit: incomeTotal - expenseTotal
     };
   });
 
@@ -97,7 +113,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
       <Navbar user={user} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/projects"}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
@@ -110,14 +126,44 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </CardContent>
           </Card>
 
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Income</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                ${totalIncomeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {incomes.length} payments
+              </p>
+            </CardContent>
+          </Card>
+
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/expenses"}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{expenses.length}</div>
+              <div className="text-2xl font-bold text-red-600">
+                ${totalExpenseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
               <p className="text-xs text-muted-foreground">
-                This month
+                {expenses.length} expenses
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {netProfit >= 0 ? '' : '-'}${Math.abs(netProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {netProfit >= 0 ? 'Profit' : 'Loss'}
               </p>
             </CardContent>
           </Card>
@@ -130,18 +176,6 @@ export function DashboardContent({ user }: DashboardContentProps) {
               <div className="text-2xl font-bold">${totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               <p className="text-xs text-muted-foreground">
                 Potential savings
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Receipts Processed</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{aiProcessedCount}</div>
-              <p className="text-xs text-muted-foreground">
-                AI-processed
               </p>
             </CardContent>
           </Card>
@@ -163,8 +197,8 @@ export function DashboardContent({ user }: DashboardContentProps) {
           <div className="lg:col-span-2 space-y-8">
             <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => window.location.href = "/analytics"}>
               <CardHeader>
-                <CardTitle>Monthly Spending Trend</CardTitle>
-                <CardDescription>Your expenses over the last 6 months</CardDescription>
+                <CardTitle>Income vs Expenses</CardTitle>
+                <CardDescription>Your financial overview for the last 6 months</CardDescription>
               </CardHeader>
               <CardContent className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -172,8 +206,15 @@ export function DashboardContent({ user }: DashboardContentProps) {
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [
+                        `$${Number(value).toFixed(2)}`,
+                        name === 'income' ? 'Income' : name === 'expenses' ? 'Expenses' : 'Profit'
+                      ]}
+                    />
+                    <Legend />
+                    <Bar dataKey="income" fill="#22c55e" radius={[4, 4, 0, 0]} name="Income" />
+                    <Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} name="Expenses" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -201,7 +242,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {projects.slice(0, 5).map((project: any) => (
+                    {projects.slice(0, 5).map((project: Project) => (
                       <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/projects"}>
                         <div>
                           <h3 className="font-medium">{project.name}</h3>
@@ -240,7 +281,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {expenses.slice(0, 5).map((expense: any) => (
+                    {expenses.slice(0, 5).map((expense: Expense) => (
                       <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/expenses"}>
                         <div>
                           <h3 className="font-medium">{expense.vendor}</h3>

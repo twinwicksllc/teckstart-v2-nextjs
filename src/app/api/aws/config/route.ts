@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { getServerSession } from "@/lib/auth";
 import { encrypt } from "@/lib/encryption";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const session = await getServerSession();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    let { accessKeyId, secretAccessKey, region } = body;
+    let { accessKeyId, secretAccessKey } = body;
+    const { region } = body;
 
     if (!accessKeyId || !secretAccessKey) {
       return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
@@ -71,8 +72,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error saving AWS config:", error);
-    return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Internal Server Error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

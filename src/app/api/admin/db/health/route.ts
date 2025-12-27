@@ -1,7 +1,22 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { users, projects, expenses, receipts } from "@/drizzle.schema";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
+
+interface HealthDetails {
+  env: Record<string, boolean>;
+  db: {
+    connected: boolean;
+    latencyMs?: number;
+    tables: {
+      users: boolean;
+      projects: boolean;
+      expenses: boolean;
+      receipts: boolean;
+    };
+    errors: Array<{ component: string; message: string }>;
+  };
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -20,7 +35,7 @@ export async function GET() {
     envStatus[key] = Boolean(process.env[key]);
   }
 
-  const details: Record<string, any> = {
+  const details: HealthDetails = {
     env: envStatus,
     db: {
       connected: false,
@@ -40,8 +55,8 @@ export async function GET() {
     try {
       await selectFn();
       details.db.tables[name as keyof typeof details.db.tables] = true;
-    } catch (err: any) {
-      const msg = err?.message || String(err);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       details.db.errors.push({ component: `table:${name}`, message: msg });
       console.error(`[HEALTH] Missing or inaccessible table '${name}':`, msg);
     }
@@ -52,8 +67,8 @@ export async function GET() {
     await db.execute(sql`select 1 as ok`);
     details.db.connected = true;
     details.db.latencyMs = Date.now() - startedAt;
-  } catch (err: any) {
-    const msg = err?.message || String(err);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
     details.db.errors.push({ component: "connect", message: msg });
     console.error("[HEALTH] Database connectivity failed:", msg);
     return NextResponse.json(

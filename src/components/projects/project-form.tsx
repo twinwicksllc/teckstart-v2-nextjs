@@ -46,7 +46,7 @@ export function ProjectForm() {
         const data = await response.json();
         setError(data.error || "Failed to create project");
       }
-    } catch (error) {
+    } catch {
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);

@@ -1,4 +1,4 @@
-import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand, GetUserCommand, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, InitiateAuthCommand, GetUserCommand, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cookies } from "next/headers";
 
 const cognitoClient = new CognitoIdentityProviderClient({
@@ -181,7 +181,7 @@ export async function authenticateUser(email: string, password: string): Promise
   }
 }
 
-export async function createSession(token: string, user: User): Promise<void> {
+export async function createSession(token: string): Promise<void> {
   const cookieStore = cookies();
   cookieStore.set("auth-token", token, {
     httpOnly: true,

@@ -5,6 +5,7 @@ export const projectStatusEnum = pgEnum("project_status", ["active", "completed"
 export const expenseSourceEnum = pgEnum("expense_source", ["manual", "receipt_upload", "aws_auto"]);
 export const parsingStatusEnum = pgEnum("parsing_status", ["success", "failed", "partial"]);
 export const receiptStatusEnum = pgEnum("receipt_status", ["pending", "processing", "completed", "failed"]);
+export const incomeStatusEnum = pgEnum("income_status", ["pending", "paid"]);
 
 /**
  * Core user table backing auth flow.
@@ -129,6 +130,33 @@ export type AwsConfig = typeof awsConfigs.$inferSelect;
 export type InsertAwsConfig = typeof awsConfigs.$inferInsert;
 
 /**
+ * Income table for tracking project-based income/payments
+ */
+export const incomes = pgTable("incomes", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: integer("projectId").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  description: text("description"),
+  incomeDate: timestamp("incomeDate").notNull(),
+  status: incomeStatusEnum("status").default("paid").notNull(),
+  invoiceNumber: varchar("invoiceNumber", { length: 100 }),
+  invoiceUrl: text("invoiceUrl"),
+  paymentMethod: varchar("paymentMethod", { length: 100 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("incomes_userId_idx").on(table.userId),
+  projectIdIdx: index("incomes_projectId_idx").on(table.projectId),
+  incomeDateIdx: index("incomes_incomeDate_idx").on(table.incomeDate),
+  statusIdx: index("incomes_status_idx").on(table.status),
+}));
+
+export type Income = typeof incomes.$inferSelect;
+export type InsertIncome = typeof incomes.$inferInsert;
+
+/**
  * Vendor templates for caching receipt parsing patterns
  */
 export const vendorTemplates = pgTable("vendorTemplates", {
@@ -220,7 +248,7 @@ export const receipts = pgTable("receipts", {
   fileType: varchar("fileType", { length: 100 }),
   s3Key: varchar("s3Key", { length: 500 }),
   status: receiptStatusEnum("status").default("pending").notNull(),
-  rawParsedData: jsonb("rawParsedData").$type<Record<string, any>>(),
+  rawParsedData: jsonb("rawParsedData").$type<Record<string, unknown>>(),
   normalizedData: jsonb("normalizedData").$type<{
     merchantName?: string;
     date?: string;

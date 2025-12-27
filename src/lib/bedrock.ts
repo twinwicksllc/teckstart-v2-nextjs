@@ -21,7 +21,7 @@ export interface ParsedReceipt {
     unitPrice?: number;
     amount: number;
   }>;
-  rawResponse?: Record<string, any>;
+  rawResponse?: Record<string, unknown>;
 }
 
 /**
@@ -29,8 +29,7 @@ export interface ParsedReceipt {
  */
 export async function parseReceiptWithBedrock(
   imageBase64: string,
-  imageMediaType: string,
-  fileName: string
+  imageMediaType: string
 ): Promise<ParsedReceipt> {
   const prompt = `You are an expert receipt parser for freelance expense tracking and tax filing (US Schedule C).
 
@@ -66,7 +65,7 @@ Respond with only the JSON object.`;
 
   try {
     const isPdf = imageMediaType === "application/pdf";
-    
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const content: any[] = [
       {
         type: "text" as const,
@@ -116,6 +115,7 @@ Respond with only the JSON object.`;
 
     if (parsedResponse.content && parsedResponse.content.length > 0) {
       const textContent = parsedResponse.content.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (c: any) => c.type === "text"
       );
       if (textContent) {
@@ -147,14 +147,14 @@ Respond with only the JSON object.`;
  */
 export async function parseReceiptWithHaiku(
   imageBase64: string,
-  imageMediaType: string,
-  fileName: string
+  imageMediaType: string
 ): Promise<ParsedReceipt> {
   const prompt = `Extract receipt information as JSON: {merchantName, date (YYYY-MM-DD), total (number), tax (number or null), currency, category, isTaxable (boolean), lineItems (array of {description, quantity, unitPrice, amount})}. Return only valid JSON.`;
 
   try {
     const isPdf = imageMediaType === "application/pdf";
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const content: any[] = [
       {
         type: "text" as const,
@@ -204,6 +204,7 @@ export async function parseReceiptWithHaiku(
 
     if (parsedResponse.content && parsedResponse.content.length > 0) {
       const textContent = parsedResponse.content.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (c: any) => c.type === "text"
       );
       if (textContent) {

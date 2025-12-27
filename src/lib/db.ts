@@ -5,10 +5,12 @@ import * as schema from "@/drizzle.schema";
 // Ensure env vars are loaded if running in script context
 if (!process.env.DATABASE_URL && typeof window === 'undefined') {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const dotenv = require('dotenv');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const path = require('path');
     dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
-  } catch (e) {
+  } catch {
     // Ignore error if dotenv is not available or fails
   }
 }

@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { receipts, expenses } from "@/drizzle.schema";
 import { parseReceiptWithBedrock, parseReceiptWithHaiku, ParsedReceipt } from "@/lib/bedrock";
-import { eq, and, desc, isNotNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export interface ProcessReceiptOptions {
   receiptId: number;
@@ -18,7 +18,7 @@ const MAX_RETRIES = 3;
  * Process receipt with AI parsing (with retry logic)
  */
 export async function processReceiptWithAI(options: ProcessReceiptOptions): Promise<void> {
-  const { receiptId, s3Key, imageBase64, imageMediaType, fileName, userId } = options;
+  const { receiptId, s3Key, imageBase64, imageMediaType, fileName } = options;
 
   try {
     // Get current retry count
@@ -56,29 +56,17 @@ export async function processReceiptWithAI(options: ProcessReceiptOptions): Prom
 
     // Check for similar receipts from this user to potentially skip AI or improve accuracy
     // (e.g., same filename or same vendor if we had it)
-    const [similarReceipt] = await db
-      .select()
-      .from(receipts)
-      .where(
-        and(
-          eq(receipts.userId, userId),
-          eq(receipts.fileName, fileName),
-          eq(receipts.status, "completed"),
-          isNotNull(receipts.normalizedData)
-        )
-      )
-      .orderBy(desc(receipts.createdAt))
-      .limit(1);
+    // Note: Logic for using similar receipts is currently not implemented, so we skip the query.
 
     // Try Sonnet first for best quality
     let parsedData: ParsedReceipt;
     try {
-      parsedData = await parseReceiptWithBedrock(imageBase64, imageMediaType, fileName);
+      parsedData = await parseReceiptWithBedrock(imageBase64, imageMediaType);
     } catch (sonnetError) {
       console.warn("Sonnet parsing failed, falling back to Haiku:", sonnetError);
       // Fallback to Haiku (cheaper)
       try {
-        parsedData = await parseReceiptWithHaiku(imageBase64, imageMediaType, fileName);
+        parsedData = await parseReceiptWithHaiku(imageBase64, imageMediaType);
       } catch (haikuError) {
         throw new Error(`All parsing models failed. Sonnet: ${sonnetError}. Haiku: ${haikuError}`);
       }

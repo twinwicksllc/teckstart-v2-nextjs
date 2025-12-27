@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authenticateUser, createSession } from "@/lib/auth";
+import { authenticateUser } from "@/lib/auth";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {

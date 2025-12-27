@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Project, ExpenseCategory } from "@/drizzle.schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ReceiptReviewModalProps {
@@ -31,8 +32,8 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
     projectId: initialData.projectId?.toString() || "",
     categoryId: initialData.categoryId?.toString() || "",
   });
-  const [projects, setProjects] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [categories, setCategories] = useState<ExpenseCategory[]>([]);
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +60,7 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
           
           // If we have a category name from AI but no ID, try to match it
           if (!formData.categoryId && initialData.category) {
-            const match = data.find((c: any) => 
+            const match = data.find((c: ExpenseCategory) => 
               c.name.toLowerCase() === initialData.category?.toLowerCase()
             );
             if (match) {
@@ -87,6 +88,7 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
     fetchProjects();
     fetchCategories();
     fetchReceiptUrl();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expenseId, initialData.category]);
 
   const handleSave = async () => {
@@ -109,7 +111,7 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
         const data = await response.json();
         setError(data.error || "Failed to save changes");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred while saving");
     } finally {
       setSaving(false);
@@ -224,11 +226,14 @@ export function ReceiptReviewModal({ expenseId, initialData, onClose, onSave }: 
                     title="Receipt PDF"
                   />
                 ) : (
-                  <img 
-                    src={receiptUrl} 
-                    alt="Receipt" 
-                    className="max-w-full max-h-full object-contain"
-                  />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                      src={receiptUrl} 
+                      alt="Receipt" 
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </>
                 )}
               </div>
             )}

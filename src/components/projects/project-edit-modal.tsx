@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Project } from "@/drizzle.schema";
 
 interface ProjectEditModalProps {
-  project: any;
+  project: Project;
   onClose: () => void;
   onSave: () => void;
 }
@@ -41,7 +42,7 @@ export function ProjectEditModal({ project, onClose, onSave }: ProjectEditModalP
         const data = await response.json();
         setError(data.error || "Failed to save changes");
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred while saving");
     } finally {
       setSaving(false);
@@ -107,7 +108,7 @@ export function ProjectEditModal({ project, onClose, onSave }: ProjectEditModalP
                 id="status"
                 className="w-full h-10 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "completed" | "on_hold" | "cancelled" })}
               >
                 <option value="active">Active</option>
                 <option value="completed">Completed</option>

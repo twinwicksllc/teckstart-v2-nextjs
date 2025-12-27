@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
     await syncAWSExpenses(session.id, start, end);
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error syncing AWS expenses:", error);
-    return NextResponse.json({ error: error.message || "Sync failed" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Sync failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
