@@ -64,13 +64,23 @@ export function DashboardContent({ user }: DashboardContentProps) {
   };
 
   // Calculate stats
-  const totalDeductions = expenses
+  const currentYear = new Date().getFullYear();
+  
+  const currentYearExpenses = expenses.filter(e => 
+    new Date(e.expenseDate).getFullYear() === currentYear
+  );
+  
+  const currentYearIncomes = incomes.filter(i => 
+    new Date(i.incomeDate).getFullYear() === currentYear
+  );
+
+  const totalDeductions = currentYearExpenses
     .filter(e => e.isDeductible)
     .reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
 
   // Calculate total income and net profit
-  const totalExpenseAmount = expenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
-  const totalIncomeAmount = incomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
+  const totalExpenseAmount = currentYearExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
+  const totalIncomeAmount = currentYearIncomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
   const netProfit = totalIncomeAmount - totalExpenseAmount;
 
   // Prepare chart data for dashboard (last 6 months)
@@ -135,7 +145,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 ${totalIncomeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {incomes.length} payments
+                {currentYearIncomes.length} payments ({currentYear})
               </p>
             </CardContent>
           </Card>
@@ -149,7 +159,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 ${totalExpenseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {expenses.length} expenses
+                {currentYearExpenses.length} expenses ({currentYear})
               </p>
             </CardContent>
           </Card>
@@ -163,7 +173,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 {netProfit >= 0 ? '' : '-'}${Math.abs(netProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {netProfit >= 0 ? 'Profit' : 'Loss'}
+                {netProfit >= 0 ? 'Profit' : 'Loss'} ({currentYear})
               </p>
             </CardContent>
           </Card>
@@ -175,7 +185,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             <CardContent>
               <div className="text-2xl font-bold">${totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               <p className="text-xs text-muted-foreground">
-                Potential savings
+                Potential savings ({currentYear})
               </p>
             </CardContent>
           </Card>
