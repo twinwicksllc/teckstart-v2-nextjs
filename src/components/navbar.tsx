@@ -18,7 +18,7 @@ export function Navbar({ user }: NavbarProps) {
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });
       const data = await response.json();
-      
+
       // If we have a logout URL from Cognito, redirect there to clear the Google session
       // Otherwise just go to login page
       if (data.logoutUrl) {
