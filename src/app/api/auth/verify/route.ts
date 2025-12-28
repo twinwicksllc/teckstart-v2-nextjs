@@ -13,20 +13,23 @@ export const runtime = "nodejs";
 
 export async function GET(request: NextRequest) {
   try {
+    let token = null;
     const authHeader = request.headers.get("authorization");
-    
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.substring(7);
+    } else {
+      // Try to get token from cookie
+      token = request.cookies.get("auth-token")?.value || null;
+    }
+    if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const token = authHeader.substring(7);
 
     const command = new GetUserCommand({
       AccessToken: token,
     });
 
     const response = await cognitoClient.send(command);
-    
     if (!response.Username) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
