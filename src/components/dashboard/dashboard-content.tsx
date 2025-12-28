@@ -87,20 +87,26 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const last6Months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
-    return d.toISOString().split("-").slice(0, 2).join("-");
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return { year, month, monthNum: d.getMonth() };
   });
 
-  const chartData = last6Months.map(month => {
-    const monthExpenses = expenses.filter(e => 
-      new Date(e.expenseDate).toISOString().startsWith(month)
-    );
-    const monthIncomes = incomes.filter(i => 
-      new Date(i.incomeDate).toISOString().startsWith(month)
-    );
+  const chartData = last6Months.map(({ year, month, monthNum }) => {
+    const monthStr = `${year}-${month}`;
+    const monthExpenses = expenses.filter(e => {
+      const expenseMonth = new Date(e.expenseDate).toISOString().split("-").slice(0, 2).join("-");
+      return expenseMonth === monthStr;
+    });
+    const monthIncomes = incomes.filter(i => {
+      const incomeMonth = new Date(i.incomeDate).toISOString().split("-").slice(0, 2).join("-");
+      return incomeMonth === monthStr;
+    });
     const expenseTotal = monthExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
     const incomeTotal = monthIncomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
+    const monthName = new Date(year, monthNum, 1).toLocaleString('default', { month: 'short' });
     return {
-      name: new Date(month + "-01").toLocaleString('default', { month: 'short' }),
+      name: monthName,
       expenses: expenseTotal,
       income: incomeTotal,
       profit: incomeTotal - expenseTotal
