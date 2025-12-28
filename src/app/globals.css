@@ -32,14 +32,14 @@
   --sidebar-bg: #0e2d4c;
   --sidebar-text: oklch(0.95 0 0);
   --sidebar-hover: rgba(255, 255, 255, 0.1);
-  --metric-amber: #feb33c;
-  --metric-amber-text: #000000;
-  --metric-rose: #af1b3f;
-  --metric-rose-text: #ffffff;
-  --metric-teal: #ffffff;
-  --metric-teal-text: #000000;
-  --metric-emerald: oklch(0.65 0.25 320);
-  --metric-emerald-text: oklch(0.98 0 0);
+  --metric-income: #FEB33C;
+  --metric-income-text: #000000;
+  --metric-expenses: #AF1B3F;
+  --metric-expenses-text: #FFFFFF;
+  --metric-profit: #3A9D3D;
+  --metric-profit-text: #FFFFFF;
+  --metric-deductions: #A8DCA8;
+  --metric-deductions-text: #1f2937;
 }
 
 .dark {

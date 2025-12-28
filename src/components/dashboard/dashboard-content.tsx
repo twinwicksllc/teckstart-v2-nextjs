@@ -179,10 +179,10 @@ export function DashboardContent({ user }: DashboardContentProps) {
         <div className="p-8">
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Total Income Card - Amber */}
+            {/* Total Income Card - Orange/Yellow */}
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
-              style={{ backgroundColor: "var(--metric-amber, #feb33c)", color: "var(--metric-amber-text, #000000)" }}
+              style={{ backgroundColor: "var(--metric-income, #FEB33C)", color: "var(--metric-income-text, #000000)" }}
               onClick={() => (window.location.href = "/analytics")}
             >
               <div className="text-sm font-medium mb-2">Total Income</div>
@@ -198,10 +198,10 @@ export function DashboardContent({ user }: DashboardContentProps) {
               </div>
             </div>
 
-            {/* Total Expenses Card - Rose */}
+            {/* Total Expenses Card - Cherry Rose */}
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
-              style={{ backgroundColor: "var(--metric-rose, #af1b3f)", color: "var(--metric-rose-text, #ffffff)" }}
+              style={{ backgroundColor: "var(--metric-expenses, #AF1B3F)", color: "var(--metric-expenses-text, #FFFFFF)" }}
               onClick={() => (window.location.href = "/expenses")}
             >
               <div className="text-sm font-medium mb-2">Total Expenses</div>
@@ -217,12 +217,12 @@ export function DashboardContent({ user }: DashboardContentProps) {
               </div>
             </div>
 
-            {/* Net Profit Card - Green */}
+            {/* Net Profit Card - Medium Jungle */}
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
               style={{
-                backgroundColor: stats.netProfit >= 0 ? "#3A9D3D" : "var(--metric-rose, #af1b3f)",
-                color: "#FFFFFF",
+                backgroundColor: stats.netProfit >= 0 ? "var(--metric-profit, #3A9D3D)" : "var(--metric-expenses, #AF1B3F)",
+                color: "var(--metric-profit-text, #FFFFFF)",
               }}
               onClick={() => (window.location.href = "/analytics")}
             >
@@ -239,12 +239,12 @@ export function DashboardContent({ user }: DashboardContentProps) {
               </div>
             </div>
 
-            {/* Tax Deductions Card - Light Green */}
+            {/* Tax Deductions Card - Celadon */}
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
               style={{
-                backgroundColor: "var(--metric-emerald, #A8DCA8)",
-                color: "var(--metric-emerald-text, #1f2937)",
+                backgroundColor: "var(--metric-deductions, #A8DCA8)",
+                color: "var(--metric-deductions-text, #1f2937)",
               }}
               onClick={() => (window.location.href = "/analytics")}
             >
@@ -321,9 +321,9 @@ export function DashboardContent({ user }: DashboardContentProps) {
                   <CardTitle>Recent Expenses</CardTitle>
                   <CardDescription>Your latest expense entries</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/expenses")}>
+                <button className="text-sm px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors" onClick={() => (window.location.href = "/expenses")}>
                   View All
-                </Button>
+                </button>
               </CardHeader>
               <CardContent>
                 {expenses.length === 0 ? (
@@ -359,9 +359,9 @@ export function DashboardContent({ user }: DashboardContentProps) {
                   <CardTitle>Recent Projects</CardTitle>
                   <CardDescription>Your latest freelance projects</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/projects")}>
+                <button className="text-sm px-3 py-1 rounded-lg hover:bg-gray-100 transition-colors" onClick={() => (window.location.href = "/projects")}>
                   View All
-                </Button>
+                </button>
               </CardHeader>
               <CardContent>
                 {projects.length === 0 ? (
