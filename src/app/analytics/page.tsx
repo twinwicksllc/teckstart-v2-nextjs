@@ -141,8 +141,7 @@ export default function AnalyticsPage() {
   };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const applyFilters = async () => {
@@ -157,7 +156,8 @@ export default function AnalyticsPage() {
       startDate: "",
       endDate: "",
     });
-    await fetchAnalytics(
+    await fetchAnalytics();
+  };
 
   if (loading && !data) {
     return (
