@@ -31,7 +31,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         style={{ borderColor: "var(--sidebar-hover)" }}
       >
         <Image
-          src="/images/teckstart-logo.png"
+          src="/teckstart-logo-v5-transparent.png"
           alt="Teckstart Logo"
           width={180}
           height={60}

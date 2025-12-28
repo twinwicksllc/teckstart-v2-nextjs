@@ -182,7 +182,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             {/* Total Income Card - Orange/Yellow */}
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
-              style={{ backgroundColor: "var(--metric-income, #FEB33C)", color: "var(--metric-income-text, #000000)" }}
+              style={{ backgroundColor: "#FEB33C", color: "#000000" }}
               onClick={() => (window.location.href = "/analytics")}
             >
               <div className="text-sm font-medium mb-2">Total Income</div>
@@ -201,7 +201,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             {/* Total Expenses Card - Cherry Rose */}
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
-              style={{ backgroundColor: "var(--metric-expenses, #AF1B3F)", color: "var(--metric-expenses-text, #FFFFFF)" }}
+              style={{ backgroundColor: "#AF1B3F", color: "#FFFFFF" }}
               onClick={() => (window.location.href = "/expenses")}
             >
               <div className="text-sm font-medium mb-2">Total Expenses</div>
@@ -221,8 +221,8 @@ export function DashboardContent({ user }: DashboardContentProps) {
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
               style={{
-                backgroundColor: stats.netProfit >= 0 ? "var(--metric-profit, #3A9D3D)" : "var(--metric-expenses, #AF1B3F)",
-                color: "var(--metric-profit-text, #FFFFFF)",
+                backgroundColor: stats.netProfit >= 0 ? "#3A9D3D" : "#AF1B3F",
+                color: "#FFFFFF",
               }}
               onClick={() => (window.location.href = "/analytics")}
             >
@@ -243,8 +243,8 @@ export function DashboardContent({ user }: DashboardContentProps) {
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
               style={{
-                backgroundColor: "var(--metric-deductions, #A8DCA8)",
-                color: "var(--metric-deductions-text, #1f2937)",
+                backgroundColor: "#A8DCA8",
+                color: "#1f2937",
               }}
               onClick={() => (window.location.href = "/analytics")}
             >
