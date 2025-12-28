@@ -182,7 +182,7 @@ export async function authenticateUser(email: string, password: string): Promise
 }
 
 export async function createSession(token: string): Promise<void> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   cookieStore.set("auth-token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -193,7 +193,7 @@ export async function createSession(token: string): Promise<void> {
 }
 
 export async function destroySession(): Promise<void> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   cookieStore.delete("auth-token");
 }
 export async function registerUser(email: string, password: string): Promise<{ success: boolean; error?: string }> {
