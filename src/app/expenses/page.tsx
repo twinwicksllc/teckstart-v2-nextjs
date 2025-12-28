@@ -6,7 +6,8 @@ import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
 import { Expense } from "@/drizzle.schema";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { User } from "@/drizzle.schema";
+
+type AuthUser = Omit<User, "name"> & { name: string };
 
 interface ExpenseWithDetails extends Expense {
   projectName?: string | null;
@@ -15,7 +16,7 @@ interface ExpenseWithDetails extends Expense {
 
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<ExpenseWithDetails[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithDetails | null>(null);
 
@@ -29,7 +30,8 @@ export default function ExpensesPage() {
       const response = await fetch("/api/auth/verify");
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        // Ensure name is always string
+        setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
       console.error("Failed to fetch user:", err);
