@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, DollarSign, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react"
 
+// Cache busting - v0 landing page design
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
