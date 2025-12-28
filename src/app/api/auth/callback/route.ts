@@ -92,16 +92,23 @@ export async function GET(request: NextRequest) {
     // Create response and set cookie
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     
+    const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       sameSite: "lax" as const,
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     };
 
-    console.log("Setting auth-token cookie with options:", { ...cookieOptions, secure: cookieOptions.secure });
+    console.log("Setting auth-token cookie with options:", { 
+      ...cookieOptions, 
+      tokenLength: access_token?.length || 0,
+      secure: cookieOptions.secure,
+      isProduction
+    });
     response.cookies.set("auth-token", access_token, cookieOptions);
+    console.log("Cookie set on response");
 
     return response;
   } catch (err) {
