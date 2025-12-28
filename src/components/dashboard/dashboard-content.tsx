@@ -391,7 +391,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </Card>
           </div>
         </div>
-
+      </div>
     </div>
   );
 }
