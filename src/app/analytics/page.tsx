@@ -55,6 +55,10 @@ interface AnalyticsData {
     name: string;
     value: number;
   }>;
+  byVendor?: Array<{
+    name: string;
+    amount: number;
+  }>;
 }
 
 interface Category {
