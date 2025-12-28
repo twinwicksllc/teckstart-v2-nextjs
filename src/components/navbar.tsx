@@ -16,10 +16,20 @@ export function Navbar({ user }: NavbarProps) {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      window.location.href = "/login";
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      const data = await response.json();
+      
+      // If we have a logout URL from Cognito, redirect there to clear the Google session
+      // Otherwise just go to login page
+      if (data.logoutUrl) {
+        window.location.href = data.logoutUrl;
+      } else {
+        window.location.href = "/login";
+      }
     } catch (error) {
       console.error("Logout failed:", error);
+      // Fallback to login page on error
+      window.location.href = "/login";
     }
   };
 

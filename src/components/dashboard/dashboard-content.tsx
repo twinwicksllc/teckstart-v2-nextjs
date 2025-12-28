@@ -83,12 +83,12 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const totalIncomeAmount = currentYearIncomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
   const netProfit = totalIncomeAmount - totalExpenseAmount;
 
-  // Prepare chart data for dashboard (last 6 months)
+  // Prepare chart data for dashboard (last 6 months including current month)
   const last6Months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
-    d.setMonth(d.getMonth() - i);
+    d.setMonth(d.getMonth() - (5 - i));
     return d.toISOString().split("-").slice(0, 2).join("-");
-  }).reverse();
+  });
 
   const chartData = last6Months.map(month => {
     const monthExpenses = expenses.filter(e => 
