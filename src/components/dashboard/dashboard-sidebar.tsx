@@ -1,7 +1,6 @@
 "use client"
 
 import { LayoutDashboard, Receipt, BarChart3, FileText, Settings, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
 interface User {
@@ -77,17 +76,15 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <p className="text-xs opacity-70 truncate">{user.email}</p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-3 mt-2"
+        <button
+          className="w-full justify-start mt-2 px-4 py-3 rounded-lg transition-colors flex items-center gap-3"
           style={{ color: "var(--sidebar-text)" }}
           onClick={() => (window.location.href = "/logout")}
         >
           <LogOut className="w-4 h-4" />
           <span>Log out</span>
-        </Button>
+        </button>
       </div>
     </div>
   )
-}
 }
