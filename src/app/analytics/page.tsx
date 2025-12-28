@@ -112,7 +112,9 @@ export default function AnalyticsPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch("/api/auth/verify");
+      const response = await fetch("/api/auth/verify", {
+        credentials: "include",
+      });
       if (response.ok) {
         const data = await response.json();
         // Ensure name is always string
