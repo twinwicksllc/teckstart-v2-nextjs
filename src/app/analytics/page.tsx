@@ -420,6 +420,7 @@ export default function AnalyticsPage() {
               </Card>
 
               {/* Top Vendors */}
+              {data.byVendor && data.byVendor.length > 0 && (
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle>Top 5 Vendors</CardTitle>
@@ -437,6 +438,7 @@ export default function AnalyticsPage() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+              )}
             </div>
           </>
         )}
