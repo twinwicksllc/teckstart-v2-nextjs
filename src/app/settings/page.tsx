@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { AWSConfigForm } from "@/components/aws/aws-config-form";
 import { User } from "@/drizzle.schema";
 
@@ -49,54 +49,51 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar user={user} />
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
-          <div className="max-w-4xl">
-            <h1 className="text-3xl font-bold mb-8">Settings</h1>
+    <DashboardLayout user={user}>
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="max-w-4xl">
+          <h1 className="text-3xl font-bold mb-8">Settings</h1>
 
-            {/* Profile Section */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Profile</h2>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Profile Information</CardTitle>
-                  <CardDescription>View and manage your account details</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Name
-                    </label>
-                    <div className="text-lg text-gray-900">{user.name}</div>
-                  </div>
+          {/* Profile Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Profile</h2>
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Information</CardTitle>
+                <CardDescription>View and manage your account details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Name
+                  </label>
+                  <div className="text-lg text-gray-900">{user.name}</div>
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email
-                    </label>
-                    <div className="text-lg text-gray-900">{user.email}</div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <div className="text-lg text-gray-900">{user.email}</div>
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Role
-                    </label>
-                    <div className="text-lg text-gray-900 capitalize">{user.role}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Role
+                  </label>
+                  <div className="text-lg text-gray-900 capitalize">{user.role}</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* AWS Integration Section */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Integrations</h2>
-              <AWSConfigForm />
-            </div>
+          {/* AWS Integration Section */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Integrations</h2>
+            <AWSConfigForm />
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
