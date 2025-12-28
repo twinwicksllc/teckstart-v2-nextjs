@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -55,15 +54,28 @@ interface Project {
   name: string;
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
+interface User {
+  id: number;
+  email: string;
+  name: string;
+}
 
-export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [user, setUser] = useState<any>(null);
+inconst [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<FilterState>({
+    projectId: "",
+    categoryId: "",
+    vendor: "",
+    startDate: "",
+    endDate: "",
+  });
+  const [vendorOptions, setVendorOptions] = useState<string[]>([]);
+
+  useEffect(() => {
+    const initPage = async () => {
+      await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
+    };
+    initPage();
   const [filters, setFilters] = useState({
     projectId: "",
     categoryId: "",
@@ -132,13 +144,14 @@ export default function AnalyticsPage() {
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
+  };prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const applyFilters = () => {
-    fetchAnalytics();
+  const applyFilters = async () => {
+    await fetchAnalytics();
   };
 
-  const resetFilters = () => {
+  const resetFilters = async () => {
     setFilters({
       projectId: "",
       categoryId: "",
@@ -146,9 +159,7 @@ export default function AnalyticsPage() {
       startDate: "",
       endDate: "",
     });
-    // Need to call fetchAnalytics with empty filters
-    setTimeout(fetchAnalytics, 0);
-  };
+    await fetchAnalytics(
 
   if (loading && !data) {
     return (

@@ -1,7 +1,6 @@
-// @ts-nocheck
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
@@ -29,17 +28,29 @@ interface DashboardContentProps {
   user: User;
 }
 
+interface ChartData {
+  name: string;
+  expenses: number;
+  income: number;
+  profit: number;
+}
+
+interface DashboardStats {
+  currentYearExpenses: Expense[];
+  currentYearIncomes: Income[];
+  totalDeductions: number;
+  totalExpenseAmount: number;
+  totalIncomeAmount: number;
+  netProfit: number;
+}
+
 export function DashboardContent({ user }: DashboardContentProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const [projectsRes, expensesRes, incomesRes] = await Promise.all([
         fetch("/api/projects"),
@@ -48,9 +59,9 @@ export function DashboardContent({ user }: DashboardContentProps) {
       ]);
 
       if (projectsRes.ok && expensesRes.ok) {
-        const projectsData = await projectsRes.json();
-        const expensesData = await expensesRes.json();
-        const incomesData = incomesRes.ok ? await incomesRes.json() : [];
+        const projectsData: Project[] = await projectsRes.json();
+        const expensesData: Expense[] = await expensesRes.json();
+        const incomesData: Income[] = incomesRes.ok ? await incomesRes.json() : [];
         
         setProjects(projectsData);
         setExpenses(expensesData);
@@ -61,57 +72,75 @@ export function DashboardContent({ user }: DashboardContentProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Calculate stats
-  const currentYear = new Date().getFullYear();
-  
-  const currentYearExpenses = expenses.filter(e => 
-    new Date(e.expenseDate).getFullYear() === currentYear
-  );
-  
-  const currentYearIncomes = incomes.filter(i => 
-    new Date(i.incomeDate).getFullYear() === currentYear
-  );
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
-  const totalDeductions = currentYearExpenses
-    .filter(e => e.isDeductible)
-    .reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
+  // Calculate stats with useMemo to prevent recalculations
+  const stats = useMemo((): DashboardStats => {
+    const currentYear = new Date().getFullYear();
+    
+    const currentYearExpenses = expenses.filter(e => 
+      new Date(e.expenseDate).getFullYear() === currentYear
+    );
+    
+    const currentYearIncomes = incomes.filter(i => 
+      new Date(i.incomeDate).getFullYear() === currentYear
+    );
 
-  // Calculate total income and net profit
-  const totalExpenseAmount = currentYearExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
-  const totalIncomeAmount = currentYearIncomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
-  const netProfit = totalIncomeAmount - totalExpenseAmount;
+    const totalDeductions = currentYearExpenses
+      .filter(e => e.isDeductible)
+      .reduce((sum: number, e: Expense) => sum + parseFloat(e.amount || "0"), 0);
 
-  // Prepare chart data for dashboard (last 6 months including current month)
-  const last6Months = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - (5 - i));
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    return { year, month, monthNum: d.getMonth() };
-  });
+    const totalExpenseAmount = currentYearExpenses.reduce((sum: number, e: Expense) => sum + parseFloat(e.amount || "0"), 0);
+    const totalIncomeAmount = currentYearIncomes.reduce((sum: number, i: Income) => sum + parseFloat(i.amount || "0"), 0);
+    const netProfit = totalIncomeAmount - totalExpenseAmount;
 
-  const chartData = last6Months.map(({ year, month, monthNum }) => {
-    const monthStr = `${year}-${month}`;
-    const monthExpenses = expenses.filter(e => {
-      const expenseMonth = new Date(e.expenseDate).toISOString().split("-").slice(0, 2).join("-");
-      return expenseMonth === monthStr;
-    });
-    const monthIncomes = incomes.filter(i => {
-      const incomeMonth = new Date(i.incomeDate).toISOString().split("-").slice(0, 2).join("-");
-      return incomeMonth === monthStr;
-    });
-    const expenseTotal = monthExpenses.reduce((sum, e) => sum + parseFloat(e.amount || "0"), 0);
-    const incomeTotal = monthIncomes.reduce((sum, i) => sum + parseFloat(i.amount || "0"), 0);
-    const monthName = new Date(year, monthNum, 1).toLocaleString('default', { month: 'short' });
     return {
-      name: monthName,
-      expenses: expenseTotal,
-      income: incomeTotal,
-      profit: incomeTotal - expenseTotal
+      currentYearExpenses,
+      currentYearIncomes,
+      totalDeductions,
+      totalExpenseAmount,
+      totalIncomeAmount,
+      netProfit
     };
-  });
+  }, [expenses, incomes]);
+
+  // Prepare chart data with useMemo
+  const chartData = useMemo((): ChartData[] => {
+    const last6Months = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date();
+      d.setMonth(d.getMonth() - (5 - i));
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      return { year, month, monthNum: d.getMonth() };
+    });
+
+    return last6Months.map(({ year, month, monthNum }) => {
+      const monthStr = `${year}-${month}`;
+      const monthExpenses = stats.currentYearExpenses.filter(e => {
+        const expenseMonth = new Date(e.expenseDate).toISOString().split("-").slice(0, 2).join("-");
+        return expenseMonth === monthStr;
+      });
+      const monthIncomes = stats.currentYearIncomes.filter(i => {
+        const incomeMonth = new Date(i.incomeDate).toISOString().split("-").slice(0, 2).join("-");
+        return incomeMonth === monthStr;
+      });
+      const expenseTotal = monthExpenses.reduce((sum: number, e: Expense) => sum + parseFloat(e.amount || "0"), 0);
+      const incomeTotal = monthIncomes.reduce((sum: number, i: Income) => sum + parseFloat(i.amount || "0"), 0);
+      const monthName = new Date(year, monthNum, 1).toLocaleString('default', { month: 'short' });
+      return {
+        name: monthName,
+        expenses: expenseTotal,
+        income: incomeTotal,
+        profit: incomeTotal - expenseTotal
+      };
+    });
+  }, [stats.currentYearExpenses, stats.currentYearIncomes]);
+
+  const currentYear = new Date().getFullYear();
 
   if (loading) {
     return (
@@ -148,10 +177,10 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
-                ${totalIncomeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ${stats.totalIncomeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {currentYearIncomes.length} payments ({currentYear})
+                {stats.currentYearIncomes.length} payments ({currentYear})
               </p>
             </CardContent>
           </Card>
@@ -162,10 +191,10 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">
-                ${totalExpenseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ${stats.totalExpenseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {currentYearExpenses.length} expenses ({currentYear})
+                {stats.currentYearExpenses.length} expenses ({currentYear})
               </p>
             </CardContent>
           </Card>
@@ -175,11 +204,11 @@ export function DashboardContent({ user }: DashboardContentProps) {
               <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {netProfit >= 0 ? '' : '-'}${Math.abs(netProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <div className={`text-2xl font-bold ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {stats.netProfit >= 0 ? '' : '-'}${Math.abs(stats.netProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                {netProfit >= 0 ? 'Profit' : 'Loss'} ({currentYear})
+                {stats.netProfit >= 0 ? 'Profit' : 'Loss'} ({currentYear})
               </p>
             </CardContent>
           </Card>
@@ -189,7 +218,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
               <CardTitle className="text-sm font-medium">Tax Deductions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              <div className="text-2xl font-bold">${stats.totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               <p className="text-xs text-muted-foreground">
                 Potential savings ({currentYear})
               </p>
@@ -216,14 +245,14 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 <CardTitle>Income vs Expenses</CardTitle>
                 <CardDescription>Your financial overview for the last 6 months</CardDescription>
               </CardHeader>
-              <CardContent className="h-[200px]">
+              <CardContent className="h-50">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip 
-                      formatter={(value: number, name: string) => {
+                      formatter={(value: number | string, name: string) => {
                         const label = name === 'income' || name === 'Income'
                           ? 'Income'
                           : name === 'expenses' || name === 'Expenses'
@@ -268,7 +297,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {projects.slice(0, 5).map((project: Project) => (
+                    {projects.slice(0, 5).map((project) => (
                       <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/projects"}>
                         <div>
                           <h3 className="font-medium">{project.name}</h3>
@@ -307,7 +336,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {expenses.slice(0, 5).map((expense: Expense) => (
+                    {expenses.slice(0, 5).map((expense) => (
                       <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/expenses"}>
                         <div>
                           <h3 className="font-medium">{expense.vendor}</h3>
