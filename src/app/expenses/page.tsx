@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
-import { Expense } from "@/drizzle.schema";
 
+import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { User } from "@/drizzle.schema";
 
 type AuthUser = Omit<User, "name"> & { name: string };
