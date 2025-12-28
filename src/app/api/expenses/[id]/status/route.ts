@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getServerSession();
@@ -15,7 +15,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const receiptId = parseInt(params.id, 10);
+    const { id } = await params;
+    const receiptId = parseInt(id, 10);
 
     if (isNaN(receiptId)) {
       return NextResponse.json(
