@@ -4,7 +4,7 @@ import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import { getServerSession } from "@/lib/auth";
 
 export default async function DashboardPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("auth-token");
 
   if (!token) {
