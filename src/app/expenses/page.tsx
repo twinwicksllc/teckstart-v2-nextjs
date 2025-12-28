@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
 
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { User } from "@/drizzle.schema";
+import { User, Expense } from "@/drizzle.schema";
 
 type AuthUser = Omit<User, "name"> & { name: string };
 
