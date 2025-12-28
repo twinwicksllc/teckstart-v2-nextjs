@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       id: dbUser.id,
       email: dbUser.email,
-      name: dbUser.name ?? email.split("@")[0],
+      name: dbUser.name ? dbUser.name : email.split("@")[0],
       role: dbUser.role,
     });
   } catch (error) {
