@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const redirectUri = process.env.NEXT_PUBLIC_AUTH_CALLBACK_URL || `${new URL(request.url).origin}/login`;
 
     // Clear the auth cookie
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const response = NextResponse.json({
       success: true,
       message: "Logged out successfully",
