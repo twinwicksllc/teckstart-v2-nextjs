@@ -92,7 +92,10 @@ export async function GET(request: NextRequest) {
     // Create response and set cookie
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     
-    const isProduction = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production";
+    const nodeEnv = process.env.NODE_ENV;
+    const vercelEnv = process.env.VERCEL_ENV;
+    // Only set secure:true in production, always false otherwise
+    const isProduction = nodeEnv === "production" || vercelEnv === "production";
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
@@ -101,14 +104,23 @@ export async function GET(request: NextRequest) {
       path: "/",
     };
 
-    console.log("Setting auth-token cookie with options:", { 
-      ...cookieOptions, 
-      tokenLength: access_token?.length || 0,
-      secure: cookieOptions.secure,
-      isProduction
+    // Extra debug logging
+    console.log("[AUTH CALLBACK] ENV:", {
+      NODE_ENV: nodeEnv,
+      VERCEL_ENV: vercelEnv,
+      isProduction,
+      cookieOptions,
+      tokenLength: access_token?.length || 0
     });
+
+    // Force secure:false for all non-production
+    if (!isProduction) {
+      cookieOptions.secure = false;
+      console.log("[AUTH CALLBACK] Forcing cookieOptions.secure = false for non-production");
+    }
+
     response.cookies.set("auth-token", access_token, cookieOptions);
-    console.log("Cookie set on response");
+    console.log("[AUTH CALLBACK] Cookie set on response", cookieOptions);
 
     return response;
   } catch (err) {
