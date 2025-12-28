@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ProjectEditModal } from "@/components/projects/project-edit-modal";
-import { Navbar } from "@/components/navbar";
 import { IncomeForm } from "@/components/incomes/income-form";
 import { Project, User } from "@/drizzle.schema";
+import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 
 interface ProjectWithFinancials {
   id: number;
@@ -107,17 +107,17 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user || undefined} />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-          <Link href="/projects/new">
-            <Button>Create Project</Button>
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 gap-6">
+    <div className="flex min-h-screen bg-gray-50">
+      <DashboardSidebar user={user || { id: 0, email: '', name: '', role: 'user' }} />
+      <div className="flex-1 ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
+            <Link href="/projects/new">
+              <Button>Create Project</Button>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 gap-6">
           {projects.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">

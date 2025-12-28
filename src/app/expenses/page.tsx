@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
-import { Navbar } from "@/components/navbar";
 import { Expense, User } from "@/drizzle.schema";
+import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 
 interface ExpenseWithDetails extends Expense {
   projectName?: string | null;
@@ -71,23 +71,23 @@ export default function ExpensesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user || undefined} />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Expenses</h1>
-          <Link href="/expenses/new">
-            <Button>Add Expense</Button>
-          </Link>
-        </div>
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
-            {expenses.length === 0 ? (
-              <li className="px-6 py-12 text-center">
-                <p className="text-gray-500 mb-4">No expenses found.</p>
-                <Link href="/expenses/new">
-                  <Button>Add Your First Expense</Button>
+    <div className="flex min-h-screen bg-gray-50">
+      <DashboardSidebar user={user || { id: 0, email: '', name: '', role: 'user' }} />
+      <div className="flex-1 ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Expenses</h1>
+            <Link href="/expenses/new">
+              <Button>Add Expense</Button>
+            </Link>
+          </div>
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <ul className="divide-y divide-gray-200">
+              {expenses.length === 0 ? (
+                <li className="px-6 py-12 text-center">
+                  <p className="text-gray-500 mb-4">No expenses found.</p>
+                  <Link href="/expenses/new">
+                    <Button>Add Your First Expense</Button>
                 </Link>
               </li>
             ) : (

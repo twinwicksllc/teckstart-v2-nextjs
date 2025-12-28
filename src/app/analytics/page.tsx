@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Navbar } from "@/components/navbar";
+import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import {
   BarChart,
   Bar,
@@ -185,19 +185,19 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user || undefined} />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Insights & Analytics</h1>
-        </div>
-        {/* Filters */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
+    <div className="flex min-h-screen bg-gray-50">
+      <DashboardSidebar user={user || { id: 0, email: '', name: '', role: 'user' }} />
+      <div className="flex-1 ml-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Insights & Analytics</h1>
+          </div>
+          {/* Filters */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-lg">Filters</CardTitle>
+            </CardHeader>
+            <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <Label>Project</Label>

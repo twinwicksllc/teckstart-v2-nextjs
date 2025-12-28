@@ -18,7 +18,6 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <DashboardSidebar user={user} />
-
       {/* Main Content */}
       <div className="flex-1 ml-64">
         {children}
