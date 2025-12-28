@@ -1,8 +1,8 @@
 "use client"
 
-import { LayoutDashboard, Receipt, FileText, BarChart3, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, Receipt, BarChart3, FileText, Settings, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import Image from "next/image"
 
 interface User {
   id: number
@@ -17,7 +17,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const navItems = [
-    { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
+    { icon: LayoutDashboard, label: "Overview", href: "/" },
     { icon: Receipt, label: "Expenses", href: "/expenses" },
     { icon: FileText, label: "Projects", href: "/projects" },
     { icon: BarChart3, label: "Analytics", href: "/analytics" },
@@ -31,9 +31,13 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         className="flex items-center justify-center px-6 py-6 border-b"
         style={{ borderColor: "var(--sidebar-hover)" }}
       >
-        <h1 className="text-xl font-bold" style={{ color: "var(--sidebar-text)" }}>
-          Teckstart
-        </h1>
+        <Image
+          src="/images/teckstart-logo.png"
+          alt="Teckstart Logo"
+          width={180}
+          height={60}
+          className="object-contain"
+        />
       </div>
 
       {/* Navigation */}
@@ -75,7 +79,8 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 mt-2 text-white hover:bg-white/10"
+          className="w-full justify-start gap-3 mt-2"
+          style={{ color: "var(--sidebar-text)" }}
           onClick={() => (window.location.href = "/logout")}
         >
           <LogOut className="w-4 h-4" />
@@ -84,4 +89,5 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       </div>
     </div>
   )
+}
 }
