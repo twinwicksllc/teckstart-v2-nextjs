@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
-import { DashboardSidebar } from "./dashboard-sidebar";
 import {
   BarChart,
   Bar,
@@ -155,12 +154,9 @@ export function DashboardContent({ user }: DashboardContentProps) {
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: "var(--background, #ededf4)" }}>
-      {/* Sidebar */}
-      <DashboardSidebar user={user} />
-
+    <div className="min-h-screen" style={{ backgroundColor: "var(--background, #ededf4)" }}>
       {/* Main Content */}
-      <div className="flex-1 ml-64">
+      <div className="flex-1">
         {/* Top Bar */}
         <div className="h-16 border-b bg-white px-8 flex items-center justify-between sticky top-0 z-10">
           <h1 className="text-2xl font-semibold">Dashboard</h1>
@@ -395,7 +391,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
             </Card>
           </div>
         </div>
-      </div>
+
     </div>
   );
 }
