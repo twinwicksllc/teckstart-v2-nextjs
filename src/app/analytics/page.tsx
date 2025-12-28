@@ -60,6 +60,14 @@ interface User {
   name: string;
 }
 
+interface FilterState {
+  projectId: string;
+  categoryId: string;
+  vendor: string;
+  startDate: string;
+  endDate: string;
+}
+
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -80,20 +88,6 @@ export default function AnalyticsPage() {
       await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
     };
     initPage();
-  const [filters, setFilters] = useState({
-    projectId: "",
-    categoryId: "",
-    vendor: "",
-    startDate: "",
-    endDate: "",
-  });
-  const [vendorOptions, setVendorOptions] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetchFilters();
-    fetchAnalytics();
-    fetchUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUser = async () => {
