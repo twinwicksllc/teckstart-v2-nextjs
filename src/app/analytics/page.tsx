@@ -184,9 +184,17 @@ export default function AnalyticsPage() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar user={user || { id: 0, email: '', name: '', role: 'user' }} />
+      <DashboardSidebar user={user} />
       <div className="flex-1 ml-64">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center mb-6">
