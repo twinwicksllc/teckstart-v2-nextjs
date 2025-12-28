@@ -7,6 +7,8 @@ import Link from "next/link";
 import { ProjectEditModal } from "@/components/projects/project-edit-modal";
 import { IncomeForm } from "@/components/incomes/income-form";
 import { Project, User } from "@/drizzle.schema";
+
+type AuthUser = Omit<User, "name"> & { name: string };
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 
 interface ProjectWithFinancials {
@@ -29,7 +31,7 @@ interface ProjectWithFinancials {
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectWithFinancials[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<ProjectWithFinancials | null>(null);
   const [addingIncomeToProject, setAddingIncomeToProject] = useState<ProjectWithFinancials | null>(null);
@@ -44,7 +46,8 @@ export default function ProjectsPage() {
       const response = await fetch("/api/auth/verify");
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        // Ensure name is always string
+        setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
       console.error("Failed to fetch user:", err);

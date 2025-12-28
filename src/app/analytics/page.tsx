@@ -74,9 +74,11 @@ interface Project {
 interface User {
   id: number;
   email: string;
-  name: string;
+  name: string | null;
   role: "user" | "admin";
 }
+
+type AuthUser = Omit<User, "name"> & { name: string };
 
 interface FilterState {
   projectId: string;
@@ -90,7 +92,7 @@ export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     projectId: "",
@@ -113,7 +115,8 @@ export default function AnalyticsPage() {
       const response = await fetch("/api/auth/verify");
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        // Ensure name is always string
+        setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
       console.error("Failed to fetch user:", err);
