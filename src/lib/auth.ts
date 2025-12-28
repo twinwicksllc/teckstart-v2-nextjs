@@ -13,7 +13,7 @@ interface User {
 }
 
 export async function getServerSession(): Promise<User | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("auth-token")?.value;
 
   if (!token) {
