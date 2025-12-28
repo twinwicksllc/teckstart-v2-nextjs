@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
-import { Navbar } from "@/components/navbar";
+import { DashboardSidebar } from "./dashboard-sidebar";
 import {
   BarChart,
   Bar,
@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Project, Expense, Income } from "@/drizzle.schema";
+import { TrendingUp, TrendingDown, Search } from "lucide-react";
 
 interface User {
   id: number;
@@ -154,98 +155,126 @@ export function DashboardContent({ user }: DashboardContentProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar user={user} />
+    <div className="flex min-h-screen" style={{ backgroundColor: "var(--background, #ededf4)" }}>
+      {/* Sidebar */}
+      <DashboardSidebar user={user} />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/projects"}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{projects.length}</div>
-              <p className="text-xs text-muted-foreground">
-                Active projects
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Income</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                ${stats.totalIncomeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {stats.currentYearIncomes.length} payments ({currentYear})
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/expenses"}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">
-                ${stats.totalExpenseAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {stats.currentYearExpenses.length} expenses ({currentYear})
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Net Profit</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${stats.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {stats.netProfit >= 0 ? '' : '-'}${Math.abs(stats.netProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {stats.netProfit >= 0 ? 'Profit' : 'Loss'} ({currentYear})
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => window.location.href = "/analytics"}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tax Deductions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${stats.totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              <p className="text-xs text-muted-foreground">
-                Potential savings ({currentYear})
-              </p>
-            </CardContent>
-          </Card>
+      {/* Main Content */}
+      <div className="flex-1 ml-64">
+        {/* Top Bar */}
+        <div className="h-16 border-b bg-white px-8 flex items-center justify-between sticky top-0 z-10">
+          <h1 className="text-2xl font-semibold">Dashboard</h1>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search transactions, projects..."
+                className="pl-10 pr-4 py-2 border rounded-lg w-80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-semibold">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Upload Receipt</CardTitle>
-              <CardDescription>
-                AI-powered receipt parsing with Claude
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ReceiptUploadForm />
-            </CardContent>
-          </Card>
+        {/* Content Area */}
+        <div className="p-8">
+          {/* Metric Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Total Income Card - Amber */}
+            <div
+              className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              style={{ backgroundColor: "var(--metric-amber, #feb33c)", color: "var(--metric-amber-text, #000000)" }}
+              onClick={() => (window.location.href = "/analytics")}
+            >
+              <div className="text-sm font-medium mb-2">Total Income</div>
+              <div className="text-3xl font-bold mb-1">
+                ${stats.totalIncomeAmount.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs opacity-80 flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" />
+                {stats.currentYearIncomes.length} payments ({currentYear})
+              </div>
+            </div>
 
-          <div className="lg:col-span-2 space-y-8">
-            <Card className="cursor-pointer hover:shadow-sm transition-shadow" onClick={() => window.location.href = "/analytics"}>
+            {/* Total Expenses Card - Rose */}
+            <div
+              className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              style={{ backgroundColor: "var(--metric-rose, #af1b3f)", color: "var(--metric-rose-text, #ffffff)" }}
+              onClick={() => (window.location.href = "/expenses")}
+            >
+              <div className="text-sm font-medium mb-2">Total Expenses</div>
+              <div className="text-3xl font-bold mb-1">
+                ${stats.totalExpenseAmount.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs opacity-90 flex items-center gap-1">
+                <TrendingDown className="w-3 h-3" />
+                {stats.currentYearExpenses.length} expenses ({currentYear})
+              </div>
+            </div>
+
+            {/* Net Profit Card - Green */}
+            <div
+              className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              style={{
+                backgroundColor: stats.netProfit >= 0 ? "#3A9D3D" : "var(--metric-rose, #af1b3f)",
+                color: "#FFFFFF",
+              }}
+              onClick={() => (window.location.href = "/analytics")}
+            >
+              <div className="text-sm font-medium mb-2">Net Profit</div>
+              <div className="text-3xl font-bold mb-1">
+                {stats.netProfit >= 0 ? "" : "-"}$
+                {Math.abs(stats.netProfit).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs opacity-90">
+                {stats.netProfit >= 0 ? "Profit" : "Loss"} ({currentYear})
+              </div>
+            </div>
+
+            {/* Tax Deductions Card - Light Green */}
+            <div
+              className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
+              style={{
+                backgroundColor: "var(--metric-emerald, #A8DCA8)",
+                color: "var(--metric-emerald-text, #1f2937)",
+              }}
+              onClick={() => (window.location.href = "/analytics")}
+            >
+              <div className="text-sm font-medium mb-2">Tax Deductions</div>
+              <div className="text-3xl font-bold mb-1">
+                ${stats.totalDeductions.toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}
+              </div>
+              <div className="text-xs opacity-90">Potential savings ({currentYear})</div>
+            </div>
+          </div>
+
+          {/* Charts and Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Income vs Expenses Chart - Takes 2 columns */}
+            <Card
+              className="lg:col-span-2 cursor-pointer hover:shadow-sm transition-shadow"
+              onClick={() => (window.location.href = "/analytics")}
+            >
               <CardHeader>
-                <CardTitle>Income vs Expenses</CardTitle>
+                <CardTitle>Income vs Expenses Trend</CardTitle>
                 <CardDescription>Your financial overview for the last 6 months</CardDescription>
               </CardHeader>
-              <CardContent className="h-50">
+              <CardContent className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -275,37 +304,50 @@ export function DashboardContent({ user }: DashboardContentProps) {
               </CardContent>
             </Card>
 
+            {/* Upload Receipt Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Upload Receipt</CardTitle>
+                <CardDescription>AI-powered receipt parsing</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ReceiptUploadForm />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Items Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            {/* Recent Expenses */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Recent Projects</CardTitle>
-                  <CardDescription>
-                    Your latest freelance projects
-                  </CardDescription>
+                  <CardTitle>Recent Expenses</CardTitle>
+                  <CardDescription>Your latest expense entries</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => window.location.href = "/projects"}>
+                <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/expenses")}>
                   View All
                 </Button>
               </CardHeader>
               <CardContent>
-                {projects.length === 0 ? (
+                {expenses.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">No projects yet</p>
-                    <Button onClick={() => window.location.href = "/projects/new"}>
-                      Create Your First Project
+                    <p className="text-gray-500 mb-4">No expenses yet</p>
+                    <Button onClick={() => (window.location.href = "/expenses/new")}>
+                      Add Your First Expense
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {projects.slice(0, 5).map((project) => (
-                      <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/projects"}>
+                    {expenses.slice(0, 5).map((expense) => (
+                      <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => (window.location.href = "/expenses")}>
                         <div>
-                          <h3 className="font-medium">{project.name}</h3>
-                          <p className="text-sm text-gray-500">{project.clientName}</p>
+                          <h3 className="font-medium">{expense.vendor}</h3>
+                          <p className="text-sm text-gray-500">{expense.description}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">${project.budget || 0}</p>
-                          <p className="text-sm text-gray-500">{project.status}</p>
+                          <p className="font-medium">${expense.amount}</p>
+                          <p className="text-sm text-gray-500">{new Date(expense.expenseDate).toLocaleDateString()}</p>
                         </div>
                       </div>
                     ))}
@@ -314,37 +356,36 @@ export function DashboardContent({ user }: DashboardContentProps) {
               </CardContent>
             </Card>
 
+            {/* Recent Projects */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
-                  <CardTitle>Recent Expenses</CardTitle>
-                  <CardDescription>
-                    Your latest expense entries
-                  </CardDescription>
+                  <CardTitle>Recent Projects</CardTitle>
+                  <CardDescription>Your latest freelance projects</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => window.location.href = "/expenses"}>
+                <Button variant="ghost" size="sm" onClick={() => (window.location.href = "/projects")}>
                   View All
                 </Button>
               </CardHeader>
               <CardContent>
-                {expenses.length === 0 ? (
+                {projects.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">No expenses yet</p>
-                    <Button onClick={() => window.location.href = "/expenses/new"}>
-                      Add Your First Expense
+                    <p className="text-gray-500 mb-4">No projects yet</p>
+                    <Button onClick={() => (window.location.href = "/projects/new")}>
+                      Create Your First Project
                     </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {expenses.slice(0, 5).map((expense) => (
-                      <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = "/expenses"}>
+                    {projects.slice(0, 5).map((project) => (
+                      <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => (window.location.href = "/projects")}>
                         <div>
-                          <h3 className="font-medium">{expense.vendor}</h3>
-                          <p className="text-sm text-gray-500">{expense.description}</p>
+                          <h3 className="font-medium">{project.name}</h3>
+                          <p className="text-sm text-gray-500">{project.clientName}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">${expense.amount}</p>
-                          <p className="text-sm text-gray-500">{new Date(expense.expenseDate).toLocaleDateString()}</p>
+                          <p className="font-medium">${project.budget || 0}</p>
+                          <p className="text-sm text-gray-500">{project.status}</p>
                         </div>
                       </div>
                     ))}
