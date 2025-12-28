@@ -220,6 +220,7 @@ export default function ProjectsPage() {
               </Card>
             ))
           )}
+          </div>
         </div>
       </div>
 

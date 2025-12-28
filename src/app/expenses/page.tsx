@@ -173,23 +173,24 @@ export default function ExpensesPage() {
         </div>
       </div>
 
-      {editingExpense && (
-        <ReceiptReviewModal
-          expenseId={editingExpense.id}
-          initialData={{
-            merchantName: editingExpense.vendor,
-            total: parseFloat(editingExpense.amount),
-            date: new Date(editingExpense.expenseDate).toISOString().split("T")[0],
-            description: editingExpense.description || undefined,
-            projectId: editingExpense.projectId,
-          }}
-          onClose={() => setEditingExpense(null)}
-          onSave={() => {
-            setEditingExpense(null);
-            fetchExpenses();
-          }}
-        />
-      )}
+        {editingExpense && (
+          <ReceiptReviewModal
+            expenseId={editingExpense.id}
+            initialData={{
+              merchantName: editingExpense.vendor,
+              total: parseFloat(editingExpense.amount),
+              date: new Date(editingExpense.expenseDate).toISOString().split("T")[0],
+              description: editingExpense.description || undefined,
+              projectId: editingExpense.projectId,
+            }}
+            onClose={() => setEditingExpense(null)}
+            onSave={() => {
+              setEditingExpense(null);
+              fetchExpenses();
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }
