@@ -1,255 +1,387 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileText, DollarSign, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react"
+import Head from 'next/head'
+import Link from 'next/link'
 
-export default function LandingPage() {
+const Home = (props) => {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="container relative mx-auto px-4 py-12 md:py-20 lg:py-5">
-        <div className="mx-auto max-w-7xl">
-          {/* Announcement Badge */}
-          <div className="mb-8 flex justify-center md:mb-12">
-            <Badge
-              variant="secondary"
-              className="border-primary/20 bg-primary/5 px-4 py-2 text-primary transition-all hover:border-primary/40 hover:bg-primary/10 text-2xl"
-            >
-              <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-accent" />
-              AI-Powered Receipt Parsing Now Available
-            </Badge>
+    <>
+      <Head>
+        <title>TeckStart - Freelance Expense & Project Tracker</title>
+        <meta
+          name="description"
+          content="AI-powered freelance expense and project tracking with smart receipt parsing"
+        />
+      </Head>
+      <div className="home-container">
+        {/* Navigation */}
+        <div className="navigation-wrapper">
+          <div className="navigation-container">
+            <Link href="/" className="navigation-logo">
+              <img
+                alt="TeckStart logo"
+                src="/teckstart-v6-transparent.jpg"
+                className="navigation-logo-icon"
+              />
+              <span className="navigation-brand-text">TeckStart</span>
+            </Link>
+            <div className="navigation-links">
+              <Link href="#features" className="navigation-link">
+                Features
+              </Link>
+              <Link href="#process" className="navigation-link">
+                How it Works
+              </Link>
+              <Link href="#testimonials" className="navigation-link">
+                Testimonials
+              </Link>
+              <Link href="/login" className="navigation-link">
+                Login
+              </Link>
+            </div>
+            <div className="navigation-actions">
+              <Link href="/register" className="btn btn-primary">
+                Get Started
+              </Link>
+            </div>
+            <div className="navigation-mobile-toggle">
+              <svg viewBox="0 0 1024 1024" className="thq-icon-small">
+                <path d="M128 554.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 298.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667zM128 810.667h768c23.552 0 42.667-19.115 42.667-42.667s-19.115-42.667-42.667-42.667h-768c-23.552 0-42.667 19.115-42.667 42.667s19.115 42.667 42.667 42.667z"></path>
+              </svg>
+            </div>
           </div>
+        </div>
 
-          {/* Hero Content - Asymmetric Grid */}
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Left Column - Main Content */}
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="text-balance font-bold text-5xl tracking-tight text-foreground md:text-6xl lg:text-7xl">
-                  TeckStart
-                </h1>
-                <p className="max-w-xl text-balance text-muted-foreground text-xl leading-relaxed md:text-2xl">
-                  Freelance Expense & Project Tracker with AI-Powered Receipt Parsing
+        {/* Hero Section */}
+        <div className="hero-section">
+          <div className="hero-bg-video">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="https://images.pexels.com/videos/854322/pictures/preview-0.jpg"
+              src="https://videos.pexels.com/video-files/854322/854322-hd_1280_720_25fps.mp4"
+            />
+            <div className="hero-overlay"></div>
+          </div>
+          <div className="hero-container">
+            <div className="hero-content">
+              <h1 className="hero-title">
+                Transform Your Business with AI-Powered Automation
+              </h1>
+              <span className="hero-subtitle">
+                Streamline workflows, automate repetitive tasks, and unlock productivity with TeckStart&apos;s intelligent automation platform.
+              </span>
+              <div className="hero-actions">
+                <Link href="/register" className="btn btn-primary btn-lg">
+                  Get Started Free
+                </Link>
+                <Link href="#features" className="btn btn-lg btn-outline">
+                  Learn More
+                </Link>
+              </div>
+            </div>
+            <div className="hero-visual">
+              <div className="dashboard-mockup">
+                <img
+                  alt="Dashboard mockup"
+                  src="/placeholder-dashboard.png"
+                  className="mockup-img"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div id="features" className="thq-section-padding">
+          <div className="container">
+            <div className="features-header thq-section-max-width">
+              <h2 className="section-title">Powerful Features for Freelancers</h2>
+              <p className="section-subtitle">
+                Everything you need to manage expenses, track projects, and maximize tax deductions
+              </p>
+            </div>
+            <div className="features-grid">
+              <div className="feature-card">
+                <div className="feature-icon-wrapper">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M512 128c211.2 0 384 172.8 384 384s-172.8 384-384 384-384-172.8-384-384 172.8-384 384-384zM512 213.333c-164.949 0-298.667 133.718-298.667 298.667s133.718 298.667 298.667 298.667 298.667-133.718 298.667-298.667-133.718-298.667-298.667-298.667zM469.333 256h85.333v256h-85.333v-256zM512 682.667c-47.104 0-85.333-38.229-85.333-85.333s38.229-85.333 85.333-85.333 85.333 38.229 85.333 85.333-38.229 85.333-85.333 85.333z"></path>
+                  </svg>
+                </div>
+                <h3 className="feature-name">AI Receipt Parsing</h3>
+                <p className="section-content">
+                  Upload receipts and let AI automatically extract data, categorize expenses, and identify tax deductions
                 </p>
               </div>
-
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <Button
-                  size="lg"
-                  className="group bg-primary text-primary-foreground transition-all hover:scale-105 hover:bg-primary/90 hover:shadow-xl"
-                >
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-2 bg-transparent transition-all hover:scale-105 hover:border-primary hover:bg-primary/5"
-                >
-                  View Demo
-                </Button>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="flex flex-wrap items-center gap-6 pt-4 text-muted-foreground text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-accent" />
-                  <span>No credit card required</span>
+              <div className="feature-card">
+                <div className="feature-icon-wrapper">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M896 128h-768c-70.692 0-128 57.308-128 128v512c0 70.692 57.308 128 128 128h768c70.692 0 128-57.308 128-128v-512c0-70.692-57.308-128-128-128zM256 768h-128v-128h128v128zM256 512h-128v-128h128v128zM256 256h-128v-128h128v128zM768 768h-384v-128h384v128zM768 512h-384v-128h384v128zM768 256h-384v-128h384v128z"></path>
+                  </svg>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-accent" />
-                  <span>Free 14-day trial</span>
-                </div>
+                <h3 className="feature-name">Project Tracking</h3>
+                <p className="section-content">
+                  Track time, expenses, and income by project. Generate detailed reports for clients and tax purposes
+                </p>
               </div>
-            </div>
-
-            {/* Right Column - Stats Grid */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Card className="border-2 border-primary/20 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg">
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-bold text-4xl text-primary">$50K+</CardTitle>
-                  <CardDescription className="text-foreground">Average tax savings per year</CardDescription>
-                </CardHeader>
-              </Card>
-
-              <Card className="border-2 border-accent/20 bg-accent/5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lg">
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-bold text-4xl text-accent">98%</CardTitle>
-                  <CardDescription className="text-foreground">Receipt parsing accuracy</CardDescription>
-                </CardHeader>
-              </Card>
-
-              <Card className="border-2 border-muted transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg sm:col-span-2">
-                <CardHeader className="pb-3">
-                  <CardTitle className="font-bold text-4xl text-foreground">5,000+</CardTitle>
-                  <CardDescription className="text-foreground">
-                    Freelancers optimizing their business finances
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <div className="feature-card">
+                <div className="feature-icon-wrapper">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M512 128l256 256h-192v384h-128v-384h-192z"></path>
+                  </svg>
+                </div>
+                <h3 className="feature-name">Tax Optimization</h3>
+                <p className="section-content">
+                  Maximize deductions with smart categorization and year-end tax planning recommendations
+                </p>
+              </div>
+              <div className="feature-card">
+                <div className="feature-icon-wrapper">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M512 128c211.2 0 384 172.8 384 384s-172.8 384-384 384-384-172.8-384-384 172.8-384 384-384zM512 213.333c-164.949 0-298.667 133.718-298.667 298.667s133.718 298.667 298.667 298.667 298.667-133.718 298.667-298.667-133.718-298.667-298.667-298.667z"></path>
+                  </svg>
+                </div>
+                <h3 className="feature-name">Real-time Analytics</h3>
+                <p className="section-content">
+                  Monitor your financial health with live dashboards, profit/loss tracking, and cash flow insights
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-20 md:py-10">
-        <div className="mx-auto max-w-7xl">
-          {/* Section Header */}
-          <div className="mb-16 text-center">
-            <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
-              Features
-            </Badge>
-            <h2 className="mb-4 text-balance font-bold text-4xl tracking-tight text-foreground md:text-5xl">
-              Everything you need to succeed
-            </h2>
-            <p className="mx-auto max-w-2xl text-balance text-muted-foreground text-lg leading-relaxed md:text-xl">
-              Powerful tools designed specifically for freelancers and independent contractors
-            </p>
-          </div>
-
-          {/* Feature Cards Grid */}
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* Project Tracking Card */}
-            <Card className="group border-2 transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex items-center justify-between text-center">
-                  <div className="rounded-lg bg-[#AF1B3F]/10 p-3 transition-colors group-hover:bg-[#AF1B3F]/20">
-                    <FileText className="h-6 w-6 text-[#AF1B3F]" />
-                  </div>
+        {/* Process Section */}
+        <div id="process" className="process-section">
+          <div className="container">
+            <div className="process-header thq-section-max-width">
+              <h2 className="section-title">How It Works</h2>
+              <p className="section-subtitle">
+                Get started in minutes with our simple 3-step process
+              </p>
+            </div>
+            <div className="process-steps">
+              <div className="step-item">
+                <div className="step-number">
+                  <span className="thq-body-large">1</span>
                 </div>
-                <CardTitle className="text-2xl text-foreground text-center">Project Tracking</CardTitle>
-                <CardDescription className="text-base leading-relaxed text-center">
-                  Manage your freelance projects with ease
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Track project budgets and timelines</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Manage client information</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Monitor project status</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Generate project reports</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Expense Management Card */}
-            <Card className="group border-2 transition-all duration-300 hover:-translate-y-2 hover:border-[#AF1B3F] hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="rounded-lg bg-[#AF1B3F]/10 p-3 transition-colors group-hover:bg-[#AF1B3F]/20">
-                    <DollarSign className="h-6 w-6 text-[#AF1B3F]" />
-                  </div>
+                <div className="step-divider"></div>
+                <div className="step-icon">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M512 128c211.2 0 384 172.8 384 384s-172.8 384-384 384-384-172.8-384-384 172.8-384 384-384zM512 213.333c-164.949 0-298.667 133.718-298.667 298.667s133.718 298.667 298.667 298.667 298.667-133.718 298.667-298.667-133.718-298.667-298.667-298.667zM469.333 256h85.333v256h-85.333v-256zM512 682.667c-47.104 0-85.333-38.229-85.333-85.333s38.229-85.333 85.333-85.333 85.333 38.229 85.333 85.333-38.229 85.333-85.333 85.333z"></path>
+                  </svg>
                 </div>
-                <CardTitle className="text-2xl text-foreground text-center">Expense Management</CardTitle>
-                <CardDescription className="text-base leading-relaxed text-center">
-                  Never miss a tax-deductible expense
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Manual expense entry</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Receipt upload and parsing</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>IRS Schedule C categorization</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Tax deduction optimization</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* AI-Powered Card */}
-            <Card className="group border-2 transition-all duration-300 hover:-translate-y-2 hover:border-[#FEB33C] hover:shadow-xl">
-              <CardHeader>
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="rounded-lg bg-[#AF1B3F]/10 p-3 transition-colors group-hover:bg-[#AF1B3F]/20">
-                    <Sparkles className="h-6 w-6 text-[#AF1B3F]" />
-                  </div>
+                <h3 className="step-title">Upload Receipts</h3>
+                <p className="section-content">
+                  Snap photos of receipts or upload digital copies
+                </p>
+              </div>
+              <div className="step-item">
+                <div className="step-number">
+                  <span className="thq-body-large">2</span>
                 </div>
-                <CardTitle className="text-2xl text-foreground text-center">AI-Powered</CardTitle>
-                <CardDescription className="text-base leading-relaxed text-center">
-                  Smart automation for your business
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>AWS Bedrock receipt parsing</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Vendor template caching</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Automated categorization</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#FEB33C]" />
-                    <span>Tax compliance checking</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                <div className="step-divider"></div>
+                <div className="step-icon">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M896 128h-768c-70.692 0-128 57.308-128 128v512c0 70.692 57.308 128 128 128h768c70.692 0 128-57.308 128-128v-512c0-70.692-57.308-128-128-128zM256 768h-128v-128h128v128zM256 512h-128v-128h128v128zM256 256h-128v-128h128v128zM768 768h-384v-128h384v128zM768 512h-384v-128h384v128zM768 256h-384v-128h384v128z"></path>
+                  </svg>
+                </div>
+                <h3 className="step-title">AI Processing</h3>
+                <p className="section-content">
+                  Our AI extracts data and categorizes automatically
+                </p>
+              </div>
+              <div className="step-item">
+                <div className="step-number">
+                  <span className="thq-body-large">3</span>
+                </div>
+                <div className="step-divider"></div>
+                <div className="step-icon">
+                  <svg viewBox="0 0 1024 1024" className="thq-icon-medium">
+                    <path d="M512 128l256 256h-192v384h-128v-384h-192z"></path>
+                  </svg>
+                </div>
+                <h3 className="step-title">Track & Save</h3>
+                <p className="section-content">
+                  Monitor expenses and maximize tax deductions
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20 pb-32 md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <Card className="relative overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-accent/5 shadow-2xl transition-all duration-300 hover:border-primary/40 hover:shadow-3xl">
-            {/* Decorative Elements */}
-            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-            <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
-
-            <CardHeader className="relative text-center pb-6 pt-12">
-              <Badge variant="outline" className="mx-auto mb-6 w-fit border-primary/40 text-primary">
-                Start Today
-              </Badge>
-              <CardTitle className="mb-6 text-balance font-bold text-4xl text-foreground md:text-5xl">
-                Ready to optimize your freelance business?
-              </CardTitle>
-              <CardDescription className="mx-auto max-w-2xl text-balance text-lg leading-relaxed md:text-xl">
-                Join thousands of freelancers who are saving time and money with TeckStart.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative flex flex-col items-center gap-6 pb-12">
-              <Button
-                size="lg"
-                className="group bg-primary px-8 text-primary-foreground transition-all hover:scale-105 hover:bg-primary/90 hover:shadow-xl"
-              >
-                Start Free Trial
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-              <p className="text-muted-foreground text-sm">No credit card required • Cancel anytime</p>
-            </CardContent>
-          </Card>
+        {/* Stats Section */}
+        <div className="stats-section thq-section-padding">
+          <div className="container">
+            <div className="stats-grid">
+              <div className="stat-item">
+                <h3 className="stat-number">10,000+</h3>
+                <p className="section-content">Active Users</p>
+              </div>
+              <div className="stat-item">
+                <h3 className="stat-number">1M+</h3>
+                <p className="section-content">Receipts Processed</p>
+              </div>
+              <div className="stat-item">
+                <h3 className="stat-number">99.9%</h3>
+                <p className="section-content">Uptime</p>
+              </div>
+              <div className="stat-item">
+                <h3 className="stat-number">4.9/5</h3>
+                <p className="section-content">User Rating</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
+
+        {/* Testimonials Section */}
+        <div id="testimonials" className="thq-section-padding">
+          <div className="container">
+            <div className="testimonials-header thq-section-max-width">
+              <h2 className="section-title">Loved by Freelancers Everywhere</h2>
+              <p className="section-subtitle">
+                Join thousands of satisfied users who transformed their business
+              </p>
+            </div>
+            <div className="testimonials-rail">
+              <div className="testimonial-card">
+                <div className="testimonial-img-placeholder">
+                  <span className="thq-body-large">S</span>
+                </div>
+                <p className="testimonial-quote">
+                  &quot;TeckStart saved me 15 hours a month on expense tracking. The AI receipt parsing is incredibly accurate!&quot;
+                </p>
+                <div className="testimonial-name">Sarah Johnson</div>
+                <div className="testimonial-role">Freelance Designer</div>
+              </div>
+              <div className="testimonial-card">
+                <div className="testimonial-img-placeholder">
+                  <span className="thq-body-large">M</span>
+                </div>
+                <p className="testimonial-quote">
+                  &quot;As a freelance consultant, staying IRS compliant was always stressful. TeckStart makes it effortless.&quot;
+                </p>
+                <div className="testimonial-name">Michael Chen</div>
+                <div className="testimonial-role">Business Consultant</div>
+              </div>
+              <div className="testimonial-card">
+                <div className="testimonial-img-placeholder">
+                  <span className="thq-body-large">E</span>
+                </div>
+                <p className="testimonial-quote">
+                  &quot;The project tracking features help me stay on budget and deliver on time. Game changer!&quot;
+                </p>
+                <div className="testimonial-name">Emily Rodriguez</div>
+                <div className="testimonial-role">Web Developer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="cta-section">
+          <div className="cta-container">
+            <div className="cta-content thq-section-max-width">
+              <h2 className="section-title">Ready to Transform Your Freelance Business?</h2>
+              <p className="section-subtitle">
+                Join thousands of freelancers who are saving time and money with TeckStart
+              </p>
+              <div className="cta-form-wrapper">
+                <div className="cta-form">
+                  <div className="form-group">
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      className="form-input"
+                    />
+                  </div>
+                  <div className="form-footer">
+                    <Link href="/register" className="btn btn-primary btn-lg">
+                      Start Free Trial
+                    </Link>
+                  </div>
+                </div>
+                <div className="cta-trust-badges">
+                  <span className="thq-body-small">✓ No credit card required</span>
+                  <span className="thq-body-small">✓ 14-day free trial</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="footer-root">
+          <div className="footer-container">
+            <div className="footer-grid">
+              <div className="footer-column">
+                <Link href="/" className="footer-logo-link">
+                  <span className="footer-logo-text">TeckStart</span>
+                </Link>
+                <p className="footer-description">
+                  AI-powered freelance expense and project tracking with smart receipt parsing.
+                </p>
+                <div className="footer-social-wrapper">
+                  <a href="#" className="footer-social-link">
+                    <svg viewBox="0 0 1024 1024" className="thq-icon-small">
+                      <path d="M1024 512c0-282.77-229.23-512-512-512s-512 229.23-512 512 229.23 512 512 512 512-229.23 512-512zM759.167 402.667c0 0-45.833-27.5-93.833-27.5-120.5 0-163.167 91.167-163.167 267.167v145.833h-109.833v-145.833c0-176 42.667-267.167 163.167-267.167 48 0 93.833-27.5 93.833-27.5v67.5l-55.167 26.167c0 0-32.167 15.083-65.5 15.083-33.333 0-51.5-19.75-51.5-60.25v-48.917c0-40.5 18.167-60.25 51.5-60.25 33.333 0 65.5 15.083 65.5 15.083z"></path>
+                    </svg>
+                  </a>
+                  <a href="#" className="footer-social-link">
+                    <svg viewBox="0 0 1024 1024" className="thq-icon-small">
+                      <path d="M1024 512c0-282.77-229.23-512-512-512s-512 229.23-512 512 229.23 512 512 512 512-229.23 512-512zM384.256 716.8l0-307.2h102.4l0 307.2-102.4 0zM512 324.479c-35.584 0-64.512 28.928-64.512 64.512s28.928 64.512 64.512 64.512c35.584 0 64.512-28.928 64.512-64.512s-28.928-64.512-64.512-64.512z"></path>
+                    </svg>
+                  </a>
+                  <a href="#" className="footer-social-link">
+                    <svg viewBox="0 0 1024 1024" className="thq-icon-small">
+                      <path d="M1024 512c0-282.77-229.23-512-512-512s-512 229.23-512 512 229.23 512 512 512 512-229.23 512-512zM759.905 388.353c0 0-45.723-27.379-93.651-27.379-120.235 0-162.823 90.698-162.823 266.624v144.941h-109.114v-144.941c0-175.926 42.588-266.624 162.823-266.624 47.928 0 93.651-27.379 93.651-27.379v67.145l-54.941 26.078c0 0-32.064 15.029-65.27 15.029-33.206 0-51.305-19.726-51.305-60.117v-48.585c0-40.391 18.099-60.117 51.305-60.117 33.206 0 65.27 15.029 65.27 15.029z"></path>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <div className="footer-column">
+                <h3 className="footer-nav-title">Product</h3>
+                <div className="footer-nav-list">
+                  <Link href="#features" className="footer-nav-item">Features</Link>
+                  <Link href="#process" className="footer-nav-item">How it Works</Link>
+                  <Link href="/pricing" className="footer-nav-item">Pricing</Link>
+                  <Link href="/integrations" className="footer-nav-item">Integrations</Link>
+                </div>
+              </div>
+              <div className="footer-column">
+                <h3 className="footer-nav-title">Company</h3>
+                <div className="footer-nav-list">
+                  <Link href="/about" className="footer-nav-item">About</Link>
+                  <Link href="/blog" className="footer-nav-item">Blog</Link>
+                  <Link href="/careers" className="footer-nav-item">Careers</Link>
+                  <Link href="/contact" className="footer-nav-item">Contact</Link>
+                </div>
+              </div>
+              <div className="footer-column">
+                <h3 className="footer-nav-title">Support</h3>
+                <div className="footer-nav-list">
+                  <Link href="/help" className="footer-nav-item">Help Center</Link>
+                  <Link href="/privacy" className="footer-nav-item">Privacy Policy</Link>
+                  <Link href="/terms" className="footer-nav-item">Terms of Service</Link>
+                  <Link href="/status" className="footer-nav-item">Status</Link>
+                </div>
+              </div>
+            </div>
+            <div className="footer-bottom-bar">
+              <div className="footer-status-indicator">
+                <div className="footer-status-dot"></div>
+                <span className="footer-status-text">All systems operational</span>
+              </div>
+              <div className="footer-legal-links">
+                <Link href="/privacy" className="footer-legal-item">Privacy</Link>
+                <Link href="/terms" className="footer-legal-item">Terms</Link>
+                <span className="footer-copyright">© 2024 TeckStart. All rights reserved.</span>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
   )
 }
+
+export default Home
