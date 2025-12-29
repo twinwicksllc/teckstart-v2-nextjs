@@ -41,7 +41,10 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <button className="btn btn-primary btn-lg">
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={() => window.location.href = '/login'}
+            >
               Get Started Free
             </button>
             <button className="btn btn-lg btn-outline">

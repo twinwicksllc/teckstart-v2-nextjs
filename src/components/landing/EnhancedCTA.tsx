@@ -8,7 +8,10 @@ const EnhancedCTA = () => {
         <p className="text-lg mb-6">
           Join thousands of others who are leveraging our platform to achieve their goals.
         </p>
-        <button className="bg-white text-blue-500 font-semibold py-2 px-6 rounded shadow hover:bg-gray-200">
+        <button
+          className="bg-white text-blue-500 font-semibold py-2 px-6 rounded shadow hover:bg-gray-200"
+          onClick={() => window.location.href = '/login'}
+        >
           Get Started Now
         </button>
       </div>
