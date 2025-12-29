@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, CheckCircle, Star, Users, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle, Users, Zap } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -26,9 +26,7 @@ export default function LandingPage() {
               <Link href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
                 How it Works
               </Link>
-              <Link href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors">
-                Testimonials
-              </Link>
+              
               <Link href="/login" className="text-muted-foreground hover:text-foreground transition-colors">
                 Login
               </Link>
@@ -164,63 +162,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              What Our Users Say
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of freelancers who have transformed their business management.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="border-border">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "TeckStart has completely changed how I manage my freelance business. The AI receipt parsing saves me hours every week."
-                </p>
-                <div className="font-semibold text-foreground">Sarah Johnson</div>
-                <div className="text-sm text-muted-foreground">Graphic Designer</div>
-              </CardContent>
-            </Card>
-            <Card className="border-border">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "The project management features are incredible. I can track everything in one place and generate reports for clients effortlessly."
-                </p>
-                <div className="font-semibold text-foreground">Mike Chen</div>
-                <div className="text-sm text-muted-foreground">Web Developer</div>
-              </CardContent>
-            </Card>
-            <Card className="border-border">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  "Tax season used to be a nightmare. Now with TeckStart, I have everything organized and ready to go."
-                </p>
-                <div className="font-semibold text-foreground">Emily Rodriguez</div>
-                <div className="text-sm text-muted-foreground">Marketing Consultant</div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
+      
 
       {/* CTA Section */}
       <section className="py-20">
@@ -279,12 +221,12 @@ export default function LandingPage() {
               <ul className="space-y-2">
                 <li><Link href="/login" className="text-muted-foreground hover:text-foreground transition-colors">Login</Link></li>
                 <li><Link href="/register" className="text-muted-foreground hover:text-foreground transition-colors">Sign Up</Link></li>
-                <li><Link href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors">Testimonials</Link></li>
+                
               </ul>
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 TeckStart. All rights reserved.</p>
+            <p>&copy; 2025 TeckStart. All rights reserved.</p>
           </div>
         </div>
       </footer>
