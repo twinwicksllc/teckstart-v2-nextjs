@@ -129,14 +129,14 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   // Memoize filtered data for better performance
   const filteredExpenses = useMemo(() => {
-    if (!debouncedQuery) return stats.currentYearExpenses;
+    if (!debouncedQuery) return expenses;
     const query = debouncedQuery.toLowerCase();
-    return stats.currentYearExpenses.filter(e => 
+    return expenses.filter(e => 
       e.vendor?.toLowerCase().includes(query) ||
       e.description?.toLowerCase().includes(query) ||
       e.amount?.toString().includes(query)
     );
-  }, [stats.currentYearExpenses, debouncedQuery]);
+  }, [expenses, debouncedQuery]);
 
   const filteredProjects = useMemo(() => {
     if (!debouncedQuery) return projects;
