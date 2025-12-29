@@ -49,42 +49,7 @@ const Hero = () => {
             </button>
           </motion.div>
         </div>
-        <div className="hero-visual">
-          <motion.div 
-            className="dashboard-mockup"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <img
-              alt="TeckStart Dashboard"
-              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
-              className="mockup-img"
-            />
-            <motion.div 
-              className="mockup-floating-card"
-              animate={{ 
-                y: [0, -10, 0],
-              }}
-              transition={{ 
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <div className="flex-row">
-                <div className="icon-accent">
-                  <svg viewBox="0 0 1024 1024" className="icon">
-                    <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"></path>
-                    <path d="M696 480H544V328c0-17.7-14.3-32-32-32s-32 14.3-32 32v152H328c-17.7 0-32 14.3-32 32s14.3 32 32 32h152v152c0 17.7 14.3 32 32 32s32-14.3 32-32V544h152c17.7 0 32-14.3 32-32s-14.3-32-32-32z"></path>
-                  </svg>
-                </div>
-                <span className="card-label">Receipt Parsed</span>
-              </div>
-              <div className="card-value">$127.50</div>
-            </motion.div>
-          </motion.div>
-        </div>
+        
       </div>
 
       <style jsx>{`
@@ -123,22 +88,22 @@ const Hero = () => {
         }
 
         .hero-container {
-          gap: 4rem;
           width: 100%;
           margin: 0 auto;
           display: flex;
           padding: 4rem 2rem;
           z-index: 3;
           position: relative;
-          max-width: 1200px;
+          max-width: 800px;
         }
 
         .hero-content {
           gap: 2rem;
-          flex: 1;
           display: flex;
           flex-direction: column;
           justify-content: center;
+          align-items: center;
+          text-align: center;
         }
 
         .hero-title {
@@ -263,8 +228,6 @@ const Hero = () => {
 
         @media (max-width: 768px) {
           .hero-container {
-            text-align: center;
-            flex-direction: column;
             padding: 2rem 1rem;
           }
           
@@ -274,11 +237,6 @@ const Hero = () => {
           
           .hero-actions {
             justify-content: center;
-          }
-          
-          .mockup-floating-card {
-            top: 10px;
-            right: 10px;
           }
         }
       `}</style>
