@@ -4,16 +4,19 @@ import Process from '@/components/landing/Process'
 import Stats from '@/components/landing/Stats'
 import Integrations from '@/components/landing/Integrations'
 import EnhancedCTA from '@/components/landing/EnhancedCTA'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen">
-      <Hero />
-      <Features />
-      <Process />
-      <Stats />
-      <Integrations />
-      <EnhancedCTA />
-    </main>
+    <ErrorBoundary>
+      <main className="min-h-screen">
+        <Hero />
+        <Features />
+        <Process />
+        <Stats />
+        <Integrations />
+        <EnhancedCTA />
+      </main>
+    </ErrorBoundary>
   )
 }

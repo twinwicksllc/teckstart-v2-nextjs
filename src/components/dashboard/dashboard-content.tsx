@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
+import { usePerformanceMonitoring } from "@/lib/use-performance-monitoring";
 import {
   BarChart,
   Bar,
@@ -51,6 +52,9 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  // Monitor dashboard performance
+  usePerformanceMonitoring("Dashboard");
 
   // Debounce search to improve performance
   useEffect(() => {

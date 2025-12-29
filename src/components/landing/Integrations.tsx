@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const Integrations = () => {
@@ -279,4 +279,4 @@ const Integrations = () => {
   );
 };
 
-export default Integrations;
+export default memo(Integrations);

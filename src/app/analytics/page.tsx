@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 // Lazy load charts for better initial load performance
 const BarChart = dynamic(() => import('recharts').then(mod => ({ default: mod.BarChart })), {
@@ -236,7 +237,8 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <ErrorBoundary>
+      <div className="flex min-h-screen bg-gray-50">
       <DashboardSidebar user={user} />
       <div className="flex-1 ml-64">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

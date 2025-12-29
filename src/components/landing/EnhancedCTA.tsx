@@ -1,6 +1,6 @@
 
 'use client';
-import React from 'react';
+import React, { memo } from 'react';
 
 const EnhancedCTA = () => {
   return (
@@ -21,4 +21,4 @@ const EnhancedCTA = () => {
   );
 };
 
-export default EnhancedCTA;
+export default memo(EnhancedCTA);

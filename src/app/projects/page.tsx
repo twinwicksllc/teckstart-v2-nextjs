@@ -11,6 +11,7 @@ import { Project, User } from "@/drizzle.schema";
 type AuthUser = Omit<User, "name"> & { name: string };
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 interface ProjectWithFinancials {
   id: number;

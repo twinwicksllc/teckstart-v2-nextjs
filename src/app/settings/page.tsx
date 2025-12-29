@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { AWSConfigForm } from "@/components/aws/aws-config-form";
 import { User } from "@/drizzle.schema";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 type AuthUser = Omit<User, "name"> & { name: string };
 

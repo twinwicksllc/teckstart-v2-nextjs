@@ -8,6 +8,7 @@ import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { User, Expense } from "@/drizzle.schema";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 type AuthUser = Omit<User, "name"> & { name: string };
 

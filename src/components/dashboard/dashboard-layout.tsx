@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
+import { memo } from "react";
 import { DashboardSidebar } from "./dashboard-sidebar";
 
 interface DashboardLayoutProps {
@@ -13,7 +14,7 @@ interface DashboardLayoutProps {
   };
 }
 
-export function DashboardLayout({ children, user }: DashboardLayoutProps) {
+const DashboardLayoutComponent = ({ children, user }: DashboardLayoutProps) => {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
@@ -24,4 +25,6 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
       </div>
     </div>
   );
-}
+};
+
+export const DashboardLayout = memo(DashboardLayoutComponent);

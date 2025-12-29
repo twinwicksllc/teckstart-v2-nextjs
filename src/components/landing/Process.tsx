@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
 const Process = () => {
@@ -254,4 +254,4 @@ const Process = () => {
   );
 };
 
-export default Process;
+export default memo(Process);
