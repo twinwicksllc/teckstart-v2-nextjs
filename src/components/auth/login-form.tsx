@@ -151,7 +151,7 @@ export function LoginForm() {
         >
           <span className="mr-2 h-4 w-4 inline-block align-middle">
             <Image
-              src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+              src="/google-logo.png"
               alt="Google logo"
               width={20}
               height={20}
