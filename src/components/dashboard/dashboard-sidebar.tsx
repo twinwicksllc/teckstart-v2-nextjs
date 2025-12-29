@@ -24,12 +24,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
   ]
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col" style={{ backgroundColor: "var(--sidebar-bg)" }}>
+    <div className="fixed left-0 top-0 h-screen w-64 flex flex-col bg-sidebar border-r border-sidebar-border">
       {/* Logo Section */}
-      <div
-        className="flex items-center justify-center px-6 py-6 border-b"
-        style={{ borderColor: "var(--sidebar-hover)" }}
-      >
+      <div className="flex items-center justify-center px-6 py-6 border-b border-sidebar-border">
         <Image
           src="/teckstart-logo-v5-transparent.png"
           alt="Teckstart Logo"
@@ -47,16 +44,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
             <button
               key={item.href}
               onClick={() => (window.location.href = item.href)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
-              style={{
-                color: "var(--sidebar-text)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "var(--sidebar-hover)"
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent"
-              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.label}</span>
@@ -66,9 +54,9 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t" style={{ borderColor: "var(--sidebar-hover)" }}>
-        <div className="flex items-center gap-3 px-4 py-3 rounded-lg" style={{ color: "var(--sidebar-text)" }}>
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-semibold">
+      <div className="p-4 border-t border-sidebar-border">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground">
+          <div className="w-8 h-8 rounded-full bg-sidebar-primary/20 flex items-center justify-center text-sm font-semibold text-sidebar-primary">
             {user.name.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
@@ -77,8 +65,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           </div>
         </div>
         <button
-          className="w-full justify-start mt-2 px-4 py-3 rounded-lg transition-colors flex items-center gap-3"
-          style={{ color: "var(--sidebar-text)" }}
+          className="w-full justify-start mt-2 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors flex items-center gap-3"
           onClick={() => (window.location.href = "/logout")}
         >
           <LogOut className="w-4 h-4" />

@@ -36,14 +36,14 @@
   --chart-4: var(--celadon);
   --chart-5: var(--deep-space-blue);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: var(--deep-space-blue);
-  --sidebar-primary: var(--cherry-rose);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: var(--ghost-white);
-  --sidebar-accent-foreground: var(--deep-space-blue);
-  --sidebar-border: oklch(0.9 0 0);
-  --sidebar-ring: var(--cherry-rose);
+  --sidebar: var(--deep-space-blue);
+  --sidebar-foreground: var(--ghost-white);
+  --sidebar-primary: var(--orange);
+  --sidebar-primary-foreground: var(--deep-space-blue);
+  --sidebar-accent: var(--cherry-rose);
+  --sidebar-accent-foreground: var(--ghost-white);
+  --sidebar-border: var(--cherry-rose);
+  --sidebar-ring: var(--orange);
 }
 
 .dark {
@@ -71,14 +71,14 @@
   --chart-3: var(--medium-jungle);
   --chart-4: var(--celadon);
   --chart-5: var(--ghost-white);
-  --sidebar: oklch(0.12 0 0);
+  --sidebar: var(--deep-space-blue);
   --sidebar-foreground: var(--ghost-white);
-  --sidebar-primary: var(--cherry-rose);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.2 0 0);
+  --sidebar-primary: var(--orange);
+  --sidebar-primary-foreground: var(--deep-space-blue);
+  --sidebar-accent: var(--cherry-rose);
   --sidebar-accent-foreground: var(--ghost-white);
-  --sidebar-border: oklch(0.25 0 0);
-  --sidebar-ring: var(--cherry-rose);
+  --sidebar-border: var(--cherry-rose);
+  --sidebar-ring: var(--orange);
 }
 
 @theme inline {
