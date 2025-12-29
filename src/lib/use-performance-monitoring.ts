@@ -27,8 +27,8 @@ export function usePerformanceMonitoring(pageName: string) {
       // Log to console in development
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Performance] ${pageName}:`, {
-          loadTime: `${loadTime.toFixed(2)}ms`,
-          ...metrics,
+          loadTimeMs: `${loadTime.toFixed(2)}ms`,
+          renderTimeMs: `${loadTime.toFixed(2)}ms`,
         });
       }
 

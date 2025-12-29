@@ -7,30 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
 import { ErrorBoundary } from "@/components/error-boundary";
-
-// Lazy load charts for better initial load performance
-const BarChart = dynamic(() => import('recharts').then(mod => ({ default: mod.BarChart })), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded" />
-});
-const Bar = dynamic(() => import('recharts').then(mod => ({ default: mod.Bar })), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false });
-const Legend = dynamic(() => import('recharts').then(mod => ({ default: mod.Legend })), { ssr: false });
-const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false });
-const PieChart = dynamic(() => import('recharts').then(mod => ({ default: mod.PieChart })), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded" />
-});
-const Pie = dynamic(() => import('recharts').then(mod => ({ default: mod.Pie })), { ssr: false });
-const Cell = dynamic(() => import('recharts').then(mod => ({ default: mod.Cell })), { ssr: false });
-const LineChart = dynamic(() => import('recharts').then(mod => ({ default: mod.LineChart })), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded" />
-});
-const Line = dynamic(() => import('recharts').then(mod => ({ default: mod.Line })), { ssr: false });
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from "recharts";
 
 const COLORS = [
   "#3b82f6",
@@ -204,7 +195,7 @@ export default function AnalyticsPage() {
 
   // Memoize chart data transformations for better performance
   const transformedChartData = useMemo(() => {
-    if (!data) return { summary: {}, monthly: [], byCategory: [], byProject: [], byVendor: [] };
+    if (!data) return { summary: { totalIncome: 0, totalExpenses: 0, netProfit: 0 }, monthly: [], byCategory: [], byProject: [], byVendor: [] };
     
     return {
       summary: data.summary,
@@ -474,27 +465,30 @@ export default function AnalyticsPage() {
 
               {/* Top Vendors */}
               {transformedChartData.byVendor && transformedChartData.byVendor.length > 0 && (
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Top 5 Vendors</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={transformedChartData.byVendor} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis dataKey="name" type="category" width={100} />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="amount" fill="#FF8042" name="Total Spent ($)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle>Top 5 Vendors</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={transformedChartData.byVendor} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="name" type="category" width={100} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="amount" fill="#FF8042" name="Total Spent ($)" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
               )}
             </div>
           </>
         )}
-      </div>      </div>    </div>
+        </div>
+      </div>
+      </div>
+    </ErrorBoundary>
   );
 }

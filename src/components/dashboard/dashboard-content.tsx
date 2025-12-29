@@ -181,27 +181,6 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   const currentYear = new Date().getFullYear();
 
-  // Filter expenses and projects based on search query
-  const filteredExpenses = useMemo(() => {
-    if (!searchQuery.trim()) return expenses;
-    const query = searchQuery.toLowerCase();
-    return expenses.filter(
-      (expense) =>
-        (expense.vendor?.toLowerCase().includes(query) || false) ||
-        (expense.description?.toLowerCase().includes(query) || false)
-    );
-  }, [expenses, searchQuery]);
-
-  const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) return projects;
-    const query = searchQuery.toLowerCase();
-    return projects.filter(
-      (project) =>
-        (project.name?.toLowerCase().includes(query) || false) ||
-        (project.clientName?.toLowerCase().includes(query) || false)
-    );
-  }, [projects, searchQuery]);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
