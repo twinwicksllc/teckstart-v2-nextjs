@@ -43,9 +43,7 @@ export default function ProjectsPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch("/api/auth/verify", {
-        credentials: "include",
-      });
+      const response = await fetch("/api/auth/verify");
       if (response.ok) {
         const data = await response.json();
         // Ensure name is always string

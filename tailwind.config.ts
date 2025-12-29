@@ -51,16 +51,6 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // TeckStart Brand Colors
-        'deep-space': '#0E2D4C',
-        'orange': '#FEB33C',
-        'cherry-rose': '#AF1B3F',
-        'ghost-white': '#EDEDF4',
-        'medium-jungle': '#3A9D3D',
-        'celadon': '#A8DCA8',
-      },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -76,25 +66,10 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        'float': {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        'slide-up': {
-          '0%': { transform: 'translateY(30px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        'fade-in': {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        'float': 'float 6s ease-in-out infinite',
-        'slide-up': 'slideUp 0.6s ease-out',
-        'fade-in': 'fadeIn 0.6s ease-out',
       },
     },
   },

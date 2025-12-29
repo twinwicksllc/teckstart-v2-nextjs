@@ -49,7 +49,6 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -143,27 +142,6 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   const currentYear = new Date().getFullYear();
 
-  // Filter expenses and projects based on search query
-  const filteredExpenses = useMemo(() => {
-    if (!searchQuery.trim()) return expenses;
-    const query = searchQuery.toLowerCase();
-    return expenses.filter(
-      (expense) =>
-        (expense.vendor?.toLowerCase().includes(query) || false) ||
-        (expense.description?.toLowerCase().includes(query) || false)
-    );
-  }, [expenses, searchQuery]);
-
-  const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) return projects;
-    const query = searchQuery.toLowerCase();
-    return projects.filter(
-      (project) =>
-        (project.name?.toLowerCase().includes(query) || false) ||
-        (project.clientName?.toLowerCase().includes(query) || false)
-    );
-  }, [projects, searchQuery]);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -188,8 +166,6 @@ export function DashboardContent({ user }: DashboardContentProps) {
               <input
                 type="text"
                 placeholder="Search transactions, projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 py-2 border rounded-lg w-80 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -350,18 +326,16 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 </button>
               </CardHeader>
               <CardContent>
-                {filteredExpenses.length === 0 ? (
+                {expenses.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">{searchQuery ? "No matching expenses found" : "No expenses yet"}</p>
-                    {!searchQuery && (
-                      <Button onClick={() => (window.location.href = "/expenses/new")}>
-                        Add Your First Expense
-                      </Button>
-                    )}
+                    <p className="text-gray-500 mb-4">No expenses yet</p>
+                    <Button onClick={() => (window.location.href = "/expenses/new")}>
+                      Add Your First Expense
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {filteredExpenses.slice(0, 5).map((expense) => (
+                    {expenses.slice(0, 5).map((expense) => (
                       <div key={expense.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => (window.location.href = "/expenses")}>
                         <div>
                           <h3 className="font-medium">{expense.vendor}</h3>
@@ -390,18 +364,16 @@ export function DashboardContent({ user }: DashboardContentProps) {
                 </button>
               </CardHeader>
               <CardContent>
-                {filteredProjects.length === 0 ? (
+                {projects.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">{searchQuery ? "No matching projects found" : "No projects yet"}</p>
-                    {!searchQuery && (
-                      <Button onClick={() => (window.location.href = "/projects/new")}>
-                        Create Your First Project
-                      </Button>
-                    )}
+                    <p className="text-gray-500 mb-4">No projects yet</p>
+                    <Button onClick={() => (window.location.href = "/projects/new")}>
+                      Create Your First Project
+                    </Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {filteredProjects.slice(0, 5).map((project) => (
+                    {projects.slice(0, 5).map((project) => (
                       <div key={project.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => (window.location.href = "/projects")}>
                         <div>
                           <h3 className="font-medium">{project.name}</h3>

@@ -1,46 +1,24 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import "./globals.css"
+import { Inter } from "next/font/google";
+import { Providers } from "@/components/providers";
+import "./globals.css";
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "TeckStart - Freelance Expense & Project Tracker",
-  description: "AI-powered freelance expense and project tracking with smart receipt parsing",
-  generator: "v0.app",
-  icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
-  },
-}
+  description: "Track projects, expenses, and optimize your freelance business with AI-powered receipt parsing",
+};
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased teckstart-body" suppressHydrationWarning>
-        {children}
-        <Analytics />
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }
