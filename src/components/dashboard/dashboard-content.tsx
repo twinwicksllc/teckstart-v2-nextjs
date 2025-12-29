@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ReceiptUploadForm } from "@/components/receipts/receipt-upload-form";
-import { usePerformanceMonitoring } from "@/lib/use-performance-monitoring";
 import {
   BarChart,
   Bar,
@@ -51,21 +50,8 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-
-  // Monitor dashboard performance
-  usePerformanceMonitoring("Dashboard");
-
-  // Debounce search to improve performance
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
 
   const fetchDashboardData = useCallback(async () => {
-    let isMounted = true;
     try {
       const [projectsRes, expensesRes, incomesRes] = await Promise.all([
         fetch("/api/projects"),
@@ -73,7 +59,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
         fetch("/api/incomes")
       ]);
 
-      if (isMounted && projectsRes.ok && expensesRes.ok) {
+      if (projectsRes.ok && expensesRes.ok) {
         const projectsData: Project[] = await projectsRes.json();
         const expensesData: Expense[] = await expensesRes.json();
         const incomesData: Income[] = incomesRes.ok ? await incomesRes.json() : [];
@@ -83,18 +69,14 @@ export function DashboardContent({ user }: DashboardContentProps) {
         setIncomes(incomesData);
       }
     } catch (error) {
-      if (isMounted) console.error("Failed to fetch dashboard data:", error);
+      console.error("Failed to fetch dashboard data:", error);
     } finally {
-      if (isMounted) setLoading(false);
+      setLoading(false);
     }
-    return () => { isMounted = false; };
   }, []);
 
   useEffect(() => {
-    const cleanup = fetchDashboardData();
-    return () => {
-      cleanup.then(fn => fn && fn());
-    };
+    fetchDashboardData();
   }, [fetchDashboardData]);
 
   // Calculate stats with useMemo to prevent recalculations
@@ -161,25 +143,26 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
   const currentYear = new Date().getFullYear();
 
-  // Memoize filtered data for better performance
+  // Filter expenses and projects based on search query
   const filteredExpenses = useMemo(() => {
-    if (!debouncedQuery) return expenses;
-    const query = debouncedQuery.toLowerCase();
-    return expenses.filter(e => 
-      e.vendor?.toLowerCase().includes(query) ||
-      e.description?.toLowerCase().includes(query) ||
-      e.amount?.toString().includes(query)
+    if (!searchQuery.trim()) return expenses;
+    const query = searchQuery.toLowerCase();
+    return expenses.filter(
+      (expense) =>
+        (expense.vendor?.toLowerCase().includes(query) || false) ||
+        (expense.description?.toLowerCase().includes(query) || false)
     );
-  }, [expenses, debouncedQuery]);
+  }, [expenses, searchQuery]);
 
   const filteredProjects = useMemo(() => {
-    if (!debouncedQuery) return projects;
-    const query = debouncedQuery.toLowerCase();
-    return projects.filter(p => 
-      p.name.toLowerCase().includes(query) ||
-      p.description?.toLowerCase().includes(query)
+    if (!searchQuery.trim()) return projects;
+    const query = searchQuery.toLowerCase();
+    return projects.filter(
+      (project) =>
+        (project.name?.toLowerCase().includes(query) || false) ||
+        (project.clientName?.toLowerCase().includes(query) || false)
     );
-  }, [projects, debouncedQuery]);
+  }, [projects, searchQuery]);
 
   if (loading) {
     return (
