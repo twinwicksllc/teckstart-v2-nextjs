@@ -212,8 +212,8 @@ export function DashboardContent({ user }: DashboardContentProps) {
             <div
               className="rounded-xl p-6 cursor-pointer hover:shadow-lg transition-shadow"
               style={{
-                backgroundColor: stats.netProfit >= 0 ? "#3A9D3D" : "var(--metric-rose)",
-                color: "#FFFFFF",
+                backgroundColor: "#A8DCA8",
+                color: "#1f2937",
               }}
               onClick={() => (window.location.href = "/analytics")}
             >

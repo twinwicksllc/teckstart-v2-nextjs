@@ -42,8 +42,14 @@
   --sidebar-primary-foreground: var(--deep-space-blue);
   --sidebar-accent: var(--cherry-rose);
   --sidebar-accent-foreground: var(--ghost-white);
-  --sidebar-border: var(--cherry-rose);
+  --sidebar-border: var(--ghost-white);
   --sidebar-ring: var(--orange);
+  
+  /* Dashboard metric colors */
+  --metric-amber: var(--deep-space-blue);
+  --metric-amber-text: var(--ghost-white);
+  --metric-rose: var(--deep-space-blue);
+  --metric-rose-text: var(--ghost-white);
 }
 
 .dark {
@@ -77,7 +83,7 @@
   --sidebar-primary-foreground: var(--deep-space-blue);
   --sidebar-accent: var(--cherry-rose);
   --sidebar-accent-foreground: var(--ghost-white);
-  --sidebar-border: var(--cherry-rose);
+  --sidebar-border: var(--ghost-white);
   --sidebar-ring: var(--orange);
 }
 
