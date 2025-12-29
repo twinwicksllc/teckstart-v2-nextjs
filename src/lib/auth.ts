@@ -58,7 +58,11 @@ export async function getServerSession(): Promise<User | null> {
         email = response.UserAttributes?.find(attr => attr.Name === "email")?.Value;
         console.log("getServerSession: GetUserCommand success, email:", email);
       } catch (e) {
-        console.error("getServerSession: GetUserCommand failed:", e instanceof Error ? e.message : e);
+        // GetUserCommand fails for OAuth tokens - this is expected
+        // Log at debug level, not error
+        if (process.env.NODE_ENV === 'development') {
+          console.log("getServerSession: GetUserCommand fallback not applicable (likely OAuth token)");
+        }
       }
     }
     
