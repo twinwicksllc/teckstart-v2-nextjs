@@ -15,12 +15,14 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, user }: DashboardLayoutProps) {
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <DashboardSidebar user={user} />
-      {/* Main Content */}
-      <div className="flex-1 ml-64">
-        {children}
+    <div className="min-h-screen" style={{ backgroundColor: "var(--background, #ededf4)" }}>
+      <div className="flex min-h-screen">
+        {/* Sidebar (fixed) */}
+        <DashboardSidebar user={user} />
+        {/* Main Content */}
+        <div className="flex-1 min-h-screen pl-64">
+          {children}
+        </div>
       </div>
     </div>
   );
