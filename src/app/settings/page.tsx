@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { AWSConfigForm } from "@/components/aws/aws-config-form";
 import { User } from "@/drizzle.schema";
-import { ErrorBoundary } from "@/components/error-boundary";
 
 type AuthUser = Omit<User, "name"> & { name: string };
 
@@ -13,28 +12,25 @@ export default function SettingsPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = useCallback(async () => {
-    let isMounted = true;
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok && isMounted) {
+      if (response.ok) {
         const data = await response.json();
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      if (isMounted) console.error("Failed to fetch user:", err);
+      console.error("Failed to fetch user:", err);
     } finally {
-      if (isMounted) setLoading(false);
+      setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-    fetchUser();
-    return () => { isMounted = false; };
-  }, [fetchUser]);
+  };
 
   if (loading) {
     return (

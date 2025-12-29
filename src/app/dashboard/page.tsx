@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { getServerSession } from "@/lib/auth";
-import { ErrorBoundary } from "@/components/error-boundary";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -22,10 +21,8 @@ export default async function DashboardPage() {
   }
 
   return (
-    <ErrorBoundary>
-      <DashboardLayout user={session}>
-        <DashboardContent user={session} />
-      </DashboardLayout>
-    </ErrorBoundary>
+    <DashboardLayout user={session}>
+      <DashboardContent user={session} />
+    </DashboardLayout>
   );
 }

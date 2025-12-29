@@ -1,26 +1,24 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import dynamic from "next/dynamic";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { ErrorBoundary } from "@/components/error-boundary";
 import {
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
 } from "recharts";
 
 const COLORS = [
@@ -105,41 +103,42 @@ export default function AnalyticsPage() {
   });
   const [vendorOptions, setVendorOptions] = useState<string[]>([]);
 
-  const fetchUser = useCallback(async () => {
-    let isMounted = true;
+  useEffect(() => {
+    const initPage = async () => {
+      await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
+    };
+    initPage();
+  }, []);
+
+  const fetchUser = async () => {
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok && isMounted) {
+      if (response.ok) {
         const data = await response.json();
+        // Ensure name is always string
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      if (isMounted) console.error("Failed to fetch user:", err);
+      console.error("Failed to fetch user:", err);
     }
-    return () => { isMounted = false; };
-  }, []);
+  };
 
-  const fetchFilters = useCallback(async () => {
-    let isMounted = true;
+  const fetchFilters = async () => {
     try {
       const [pRes, cRes] = await Promise.all([
         fetch("/api/projects"),
         fetch("/api/expenses/categories"),
       ]);
-      if (isMounted) {
-        if (pRes.ok) setProjects(await pRes.json());
-        if (cRes.ok) setCategories(await cRes.json());
-      }
+      if (pRes.ok) setProjects(await pRes.json());
+      if (cRes.ok) setCategories(await cRes.json());
     } catch (err) {
-      if (isMounted) console.error("Failed to fetch filters:", err);
+      console.error("Failed to fetch filters:", err);
     }
-    return () => { isMounted = false; };
-  }, []);
+  };
 
-  const fetchAnalytics = useCallback(async () => {
-    let isMounted = true;
+  const fetchAnalytics = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -150,7 +149,7 @@ export default function AnalyticsPage() {
       if (filters.endDate) params.append("endDate", filters.endDate);
 
       const response = await fetch(`/api/analytics?${params.toString()}`);
-      if (response.ok && isMounted) {
+      if (response.ok) {
         const json = await response.json();
         setData(json);
         if (json.vendorOptions) {
@@ -158,21 +157,11 @@ export default function AnalyticsPage() {
         }
       }
     } catch (err) {
-      if (isMounted) console.error("Failed to fetch analytics:", err);
+      console.error("Failed to fetch analytics:", err);
     } finally {
-      if (isMounted) setLoading(false);
+      setLoading(false);
     }
-    return () => { isMounted = false; };
-  }, [filters]);
-
-  useEffect(() => {
-    let isMounted = true;
-    const initPage = async () => {
-      const cleanups = await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
-    };
-    initPage();
-    return () => { isMounted = false; };
-  }, [fetchFilters, fetchAnalytics, fetchUser]);
+  };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -193,24 +182,6 @@ export default function AnalyticsPage() {
     await fetchAnalytics();
   };
 
-  // Memoize chart data transformations for better performance
-  const transformedChartData = useMemo(() => {
-    if (!data) return { summary: { totalIncome: 0, totalExpenses: 0, netProfit: 0 }, monthly: [], byCategory: [], byProject: [], byVendor: [] };
-    
-    return {
-      summary: data.summary,
-      monthly: data.monthly?.map(m => ({
-        month: m.month,
-        income: Number(m.income) || 0,
-        expenses: Number(m.expenses) || 0,
-        profit: Number(m.profit) || 0
-      })) || [],
-      byCategory: data.byCategory || [],
-      byProject: data.byProject || [],
-      byVendor: data.byVendor || []
-    };
-  }, [data]);
-
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -228,8 +199,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <ErrorBoundary>
-      <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <DashboardSidebar user={user} />
       <div className="flex-1 ml-64">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -333,7 +303,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    ${(transformedChartData.summary?.totalExpenses || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${(data.summary?.totalExpenses || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -342,8 +312,8 @@ export default function AnalyticsPage() {
                   <CardTitle className="text-sm font-medium text-gray-500">Net Profit</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-2xl font-bold ${(transformedChartData.summary?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {(transformedChartData.summary?.netProfit || 0) >= 0 ? '' : '-'}${Math.abs(transformedChartData.summary?.netProfit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <div className={`text-2xl font-bold ${(data.summary?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {(data.summary?.netProfit || 0) >= 0 ? '' : '-'}${Math.abs(data.summary?.netProfit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -353,7 +323,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-blue-600">
-                    ${(data?.totalDeductible || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${(data.totalDeductible || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -367,7 +337,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent className="h-[350px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={transformedChartData.monthly}>
+                    <BarChart data={data.monthly}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
@@ -425,7 +395,7 @@ export default function AnalyticsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={transformedChartData.byCategory}
+                        data={data.byCategory}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
@@ -434,7 +404,7 @@ export default function AnalyticsPage() {
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {transformedChartData.byCategory.map((entry, index) => (
+                        {data.byCategory.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
@@ -451,7 +421,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={transformedChartData.byProject}>
+                    <BarChart data={data.byProject}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
@@ -464,31 +434,28 @@ export default function AnalyticsPage() {
               </Card>
 
               {/* Top Vendors */}
-              {transformedChartData.byVendor && transformedChartData.byVendor.length > 0 && (
-                <Card className="lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Top 5 Vendors</CardTitle>
-                  </CardHeader>
-                  <CardContent className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={transformedChartData.byVendor} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" />
-                        <YAxis dataKey="name" type="category" width={100} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="amount" fill="#FF8042" name="Total Spent ($)" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+              {data.byVendor && data.byVendor.length > 0 && (
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>Top 5 Vendors</CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data.byVendor} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis dataKey="name" type="category" width={100} />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="amount" fill="#FF8042" name="Total Spent ($)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
               )}
             </div>
           </>
         )}
-        </div>
-      </div>
-      </div>
-    </ErrorBoundary>
+      </div>      </div>    </div>
   );
 }

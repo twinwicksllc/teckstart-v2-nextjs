@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
 
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { User, Expense } from "@/drizzle.schema";
-import { ErrorBoundary } from "@/components/error-boundary";
 
 type AuthUser = Omit<User, "name"> & { name: string };
 
@@ -23,44 +21,39 @@ export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithDetails | null>(null);
 
-  const fetchUser = useCallback(async () => {
-    let isMounted = true;
+  useEffect(() => {
+    fetchExpenses();
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok && isMounted) {
+      if (response.ok) {
         const data = await response.json();
+        // Ensure name is always string
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      if (isMounted) console.error("Failed to fetch user:", err);
+      console.error("Failed to fetch user:", err);
     }
-  }, []);
+  };
 
-  const fetchExpenses = useCallback(async () => {
-    let isMounted = true;
+  const fetchExpenses = async () => {
     try {
       const response = await fetch("/api/expenses");
-      if (response.ok && isMounted) {
+      if (response.ok) {
         const data = await response.json();
         setExpenses(data);
       }
     } catch (error) {
-      if (isMounted) console.error("Failed to fetch expenses:", error);
+      console.error("Failed to fetch expenses:", error);
     } finally {
-      if (isMounted) setLoading(false);
+      setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-    const init = async () => {
-      await Promise.all([fetchExpenses(), fetchUser()]);
-    };
-    init();
-    return () => { isMounted = false; };
-  }, [fetchExpenses, fetchUser]);
+  };
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this expense?")) return;
@@ -77,16 +70,9 @@ export default function ExpensesPage() {
 
   if (loading) {
     return (
-      <DashboardLayout user={user || { id: 0, email: '', name: 'Loading...', role: 'user' }}>
-        <div className="space-y-6 p-6">
-          <div className="h-10 bg-gray-200 animate-pulse rounded-lg w-1/4" />
-          <div className="space-y-4">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="h-20 bg-gray-200 animate-pulse rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
     );
   }
 

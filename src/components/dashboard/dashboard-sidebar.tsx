@@ -46,14 +46,10 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
           return (
             <button
               key={item.href}
-              type="button"
               onClick={() => (window.location.href = item.href)}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
               style={{
                 color: "var(--sidebar-text)",
-                backgroundColor: "transparent",
-                border: "none",
-                textAlign: "left",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "var(--sidebar-hover)"

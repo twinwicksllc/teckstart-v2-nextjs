@@ -1,10 +1,10 @@
 
 'use client';
 
-import React, { memo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
-const HeroComponent = () => {
+const Hero = () => {
   return (
     <section className="hero-section">
       <div className="hero-bg-video">
@@ -248,4 +248,4 @@ const HeroComponent = () => {
   );
 };
 
-export default memo(HeroComponent);
+export default Hero;

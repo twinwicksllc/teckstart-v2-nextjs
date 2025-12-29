@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 const Stats = () => {
@@ -185,4 +185,4 @@ const Stats = () => {
   );
 };
 
-export default memo(Stats);
+export default Stats;
