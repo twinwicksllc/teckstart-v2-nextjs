@@ -127,26 +127,6 @@ export function DashboardContent({ user }: DashboardContentProps) {
     };
   }, [expenses, incomes]);
 
-  // Memoize filtered data for better performance
-  const filteredExpenses = useMemo(() => {
-    if (!debouncedQuery) return expenses;
-    const query = debouncedQuery.toLowerCase();
-    return expenses.filter(e => 
-      e.vendor?.toLowerCase().includes(query) ||
-      e.description?.toLowerCase().includes(query) ||
-      e.amount?.toString().includes(query)
-    );
-  }, [expenses, debouncedQuery]);
-
-  const filteredProjects = useMemo(() => {
-    if (!debouncedQuery) return projects;
-    const query = debouncedQuery.toLowerCase();
-    return projects.filter(p => 
-      p.name.toLowerCase().includes(query) ||
-      p.description?.toLowerCase().includes(query)
-    );
-  }, [projects, debouncedQuery]);
-
   // Prepare chart data with useMemo
   const chartData = useMemo((): ChartData[] => {
     const last6Months = Array.from({ length: 6 }, (_, i) => {
@@ -180,6 +160,26 @@ export function DashboardContent({ user }: DashboardContentProps) {
   }, [stats.currentYearExpenses, stats.currentYearIncomes]);
 
   const currentYear = new Date().getFullYear();
+
+  // Memoize filtered data for better performance
+  const filteredExpenses = useMemo(() => {
+    if (!debouncedQuery) return expenses;
+    const query = debouncedQuery.toLowerCase();
+    return expenses.filter(e => 
+      e.vendor?.toLowerCase().includes(query) ||
+      e.description?.toLowerCase().includes(query) ||
+      e.amount?.toString().includes(query)
+    );
+  }, [expenses, debouncedQuery]);
+
+  const filteredProjects = useMemo(() => {
+    if (!debouncedQuery) return projects;
+    const query = debouncedQuery.toLowerCase();
+    return projects.filter(p => 
+      p.name.toLowerCase().includes(query) ||
+      p.description?.toLowerCase().includes(query)
+    );
+  }, [projects, debouncedQuery]);
 
   if (loading) {
     return (
