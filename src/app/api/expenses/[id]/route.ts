@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { expenses } from "@/drizzle.schema";
+import { expenses, receipts } from "@/drizzle.schema";
 import { eq, and } from "drizzle-orm";
 
 export async function PATCH(
@@ -62,6 +62,25 @@ export async function DELETE(
     const { id: idParam } = await params;
     const id = parseInt(idParam);
 
+    // Get the expense first to find associated receipt
+    const [expense] = await db
+      .select()
+      .from(expenses)
+      .where(and(eq(expenses.id, id), eq(expenses.userId, session.id)))
+      .limit(1);
+
+    if (!expense) {
+      return NextResponse.json({ error: "Expense not found" }, { status: 404 });
+    }
+
+    // Delete associated receipt if it exists
+    if (expense.receiptFileKey) {
+      await db
+        .delete(receipts)
+        .where(and(eq(receipts.expenseId, id), eq(receipts.userId, session.id)));
+    }
+
+    // Delete the expense
     const [deletedExpense] = await db
       .delete(expenses)
       .where(and(eq(expenses.id, id), eq(expenses.userId, session.id)))

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, expenses, incomes } from "@/drizzle.schema";
+import { projects, expenses, incomes, receipts } from "@/drizzle.schema";
 import { eq, and, sql } from "drizzle-orm";
 
 export async function GET(
@@ -116,6 +116,24 @@ export async function DELETE(
     const { id: idParam } = await params;
     const id = parseInt(idParam);
 
+    // Delete associated incomes (they have cascade delete, but let's be explicit)
+    await db
+      .delete(incomes)
+      .where(and(eq(incomes.projectId, id), eq(incomes.userId, session.id)));
+
+    // Update expenses to remove project reference (set projectId to null)
+    await db
+      .update(expenses)
+      .set({ projectId: null, updatedAt: new Date() })
+      .where(and(eq(expenses.projectId, id), eq(expenses.userId, session.id)));
+
+    // Update receipts to remove project reference
+    await db
+      .update(receipts)
+      .set({ projectId: null, updatedAt: new Date() })
+      .where(and(eq(receipts.projectId, id), eq(receipts.userId, session.id)));
+
+    // Delete the project
     const [deletedProject] = await db
       .delete(projects)
       .where(and(eq(projects.id, id), eq(projects.userId, session.id)))

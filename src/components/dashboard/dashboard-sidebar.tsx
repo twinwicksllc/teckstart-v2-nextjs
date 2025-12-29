@@ -16,7 +16,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ user }: DashboardSidebarProps) {
   const navItems = [
-    { icon: LayoutDashboard, label: "Overview", href: "/" },
+    { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
     { icon: Receipt, label: "Expenses", href: "/expenses" },
     { icon: FileText, label: "Projects", href: "/projects" },
     { icon: BarChart3, label: "Analytics", href: "/analytics" },
