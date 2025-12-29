@@ -85,7 +85,7 @@ export function LoginForm() {
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-6">
+    <div className="bg-white shadow-lg rounded-lg border border-gray-200 p-8 w-full">
       <div className="mb-6">
         <h3 className="text-2xl font-semibold text-gray-900 mb-2">Login</h3>
         <p className="text-sm text-gray-600">
