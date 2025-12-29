@@ -28,7 +28,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
       {/* Logo Section */}
       <div className="flex items-center justify-center px-6 py-6 border-b border-sidebar-border">
         <Image
-          src="/teckstart-logo-v5-transparent.png"
+          src="/teckstart-logo.jpg"
           alt="Teckstart Logo"
           width={180}
           height={60}

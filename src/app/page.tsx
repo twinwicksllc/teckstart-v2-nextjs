@@ -13,7 +13,7 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <img
-                src="/teckstart-v6-transparent.jpg"
+                src="/teckstart-logo.jpg"
                 alt="TeckStart Logo"
                 className="h-8 w-auto"
               />
@@ -256,7 +256,7 @@ export default function LandingPage() {
             <div className="md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
                 <img
-                  src="/teckstart-v6-transparent.jpg"
+                  src="/teckstart-logo.jpg"
                   alt="TeckStart Logo"
                   className="h-8 w-auto"
                 />
