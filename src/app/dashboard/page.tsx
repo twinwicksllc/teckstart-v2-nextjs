@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { getServerSession } from "@/lib/auth";
 
 export default async function DashboardPage() {
@@ -20,9 +19,5 @@ export default async function DashboardPage() {
     redirect("/login?error=invalid_session");
   }
 
-  return (
-    <DashboardLayout user={session}>
-      <DashboardContent user={session} />
-    </DashboardLayout>
-  );
+  return <DashboardContent user={session} />;
 }

@@ -1,11 +1,7 @@
 import { useEffect } from 'react';
 
-interface PerformanceMetrics {
-  pageName: string;
-  loadTime: number;
-  renderTime: number;
-  timestamp: number;
-}
+type Gtag = (...args: unknown[]) => void;
+type AnalyticsWindow = typeof window & { gtag?: Gtag };
 
 export function usePerformanceMonitoring(pageName: string) {
   useEffect(() => {
@@ -17,13 +13,6 @@ export function usePerformanceMonitoring(pageName: string) {
     // Measure page load time
     const handleWindowLoad = () => {
       const loadTime = performance.now() - startTime;
-      const metrics: PerformanceMetrics = {
-        pageName,
-        loadTime,
-        renderTime: loadTime,
-        timestamp: Date.now(),
-      };
-
       // Log to console in development
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Performance] ${pageName}:`, {
@@ -33,8 +22,9 @@ export function usePerformanceMonitoring(pageName: string) {
       }
 
       // Send to analytics service (e.g., Google Analytics, Mixpanel)
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'page_load', {
+      const gtag = (typeof window !== 'undefined' && (window as AnalyticsWindow).gtag) || undefined;
+      if (gtag) {
+        gtag('event', 'page_load', {
           page_path: pageName,
           load_time: Math.round(loadTime),
         });
@@ -51,10 +41,11 @@ export function usePerformanceMonitoring(pageName: string) {
 }
 
 // Hook to track custom events
-export function useAnalyticsEvent(eventName: string, eventData?: Record<string, any>) {
+export function useAnalyticsEvent(eventName: string, eventData?: Record<string, unknown>) {
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', eventName, eventData);
+    const gtag = (typeof window !== 'undefined' && (window as AnalyticsWindow).gtag) || undefined;
+    if (gtag) {
+      gtag('event', eventName, eventData);
     }
 
     if (process.env.NODE_ENV === 'development') {

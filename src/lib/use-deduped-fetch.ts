@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 
 // Simple in-memory cache for deduplicating requests
-const requestCache = new Map<string, { data: any; timestamp: number }>();
+const requestCache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export function useDedupedFetch<T>(url: string, options?: RequestInit) {
@@ -13,7 +13,7 @@ export function useDedupedFetch<T>(url: string, options?: RequestInit) {
     // Check cache first
     const cached = requestCache.get(url);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setData(cached.data);
+      setData(cached.data as T);
       setLoading(false);
       return;
     }

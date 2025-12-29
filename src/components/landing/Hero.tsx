@@ -34,7 +34,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Streamline workflows, automate repetitive tasks, and unlock productivity with TeckStart's intelligent automation platform.
+            Streamline workflows, automate repetitive tasks, and unlock productivity with TeckStart&apos;s intelligent automation platform.
           </motion.p>
           <motion.div 
             className="hero-actions"

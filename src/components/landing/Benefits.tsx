@@ -114,7 +114,7 @@ export default function Benefits() {
             { value: '1M+', label: 'Receipts Processed' },
             { value: '99.9%', label: 'Uptime' },
             { value: '4.9/5', label: 'User Rating' }
-          ].map((stat, index) => (
+          ].map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="text-3xl lg:text-4xl font-bold text-deep-space mb-2">
                 {stat.value}

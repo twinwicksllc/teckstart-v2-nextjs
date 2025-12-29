@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -103,40 +103,7 @@ export default function AnalyticsPage() {
   });
   const [vendorOptions, setVendorOptions] = useState<string[]>([]);
 
-  useEffect(() => {
-    const initPage = async () => {
-      await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
-    };
-    initPage();
-  }, []);
-
-  const fetchUser = async () => {
-    try {
-      const response = await fetch("/api/auth/verify");
-      if (response.ok) {
-        const data = await response.json();
-        // Ensure name is always string
-        setUser({ ...data, name: data.name || "" });
-      }
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    }
-  };
-
-  const fetchFilters = async () => {
-    try {
-      const [pRes, cRes] = await Promise.all([
-        fetch("/api/projects"),
-        fetch("/api/expenses/categories"),
-      ]);
-      if (pRes.ok) setProjects(await pRes.json());
-      if (cRes.ok) setCategories(await cRes.json());
-    } catch (err) {
-      console.error("Failed to fetch filters:", err);
-    }
-  };
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -158,6 +125,41 @@ export default function AnalyticsPage() {
       console.error("Failed to fetch analytics:", err);
     } finally {
       setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    const initPage = async () => {
+      await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
+    };
+    void initPage();
+  }, [fetchAnalytics]);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("/api/auth/verify", {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Ensure name is always string
+        setUser({ ...data, name: data.name || "" });
+      }
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
+
+  const fetchFilters = async () => {
+    try {
+      const [pRes, cRes] = await Promise.all([
+        fetch("/api/projects"),
+        fetch("/api/expenses/categories"),
+      ]);
+      if (pRes.ok) setProjects(await pRes.json());
+      if (cRes.ok) setCategories(await cRes.json());
+    } catch (err) {
+      console.error("Failed to fetch filters:", err);
     }
   };
 

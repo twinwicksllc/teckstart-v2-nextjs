@@ -90,7 +90,7 @@ export default function Testimonials() {
 
                 {/* Quote */}
                 <p className="text-ghost-white leading-relaxed mb-6">
-                  "{testimonial.quote}"
+                  {testimonial.quote}
                 </p>
 
                 {/* Author */}
@@ -133,7 +133,7 @@ export default function Testimonials() {
 
                 {/* Quote */}
                 <p className="text-ghost-white leading-relaxed mb-6">
-                  "{testimonial.quote}"
+                  {testimonial.quote}
                 </p>
 
                 {/* Author */}

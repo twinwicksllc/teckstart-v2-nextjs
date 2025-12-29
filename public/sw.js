@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Service Worker for offline support and caching
 const CACHE_NAME = 'teckstart-v1';
 const urlsToCache = [

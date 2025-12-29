@@ -32,10 +32,11 @@
   --sidebar-bg: #0e2d4c;
   --sidebar-text: oklch(0.95 0 0);
   --sidebar-hover: rgba(255, 255, 255, 0.1);
-  --metric-income: #FEB33C;
-  --metric-income-text: #000000;
-  --metric-expenses: #AF1B3F;
-  --metric-expenses-text: #FFFFFF;
+  /* Metric cards palette used by redesigned dashboard */
+  --metric-amber: #FEB33C;
+  --metric-amber-text: #000000;
+  --metric-rose: #AF1B3F;
+  --metric-rose-text: #FFFFFF;
   --metric-profit: #3A9D3D;
   --metric-profit-text: #FFFFFF;
   --metric-deductions: #A8DCA8;
