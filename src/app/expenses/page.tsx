@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ReceiptReviewModal } from "@/components/receipts/receipt-review-modal";
 
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { User, Expense } from "@/drizzle.schema";
 
 type AuthUser = Omit<User, "name"> & { name: string };
@@ -75,9 +76,16 @@ export default function ExpensesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <DashboardLayout user={user || { id: 0, email: '', name: 'Loading...', role: 'user' }}>
+        <div className="space-y-6 p-6">
+          <div className="h-10 bg-gray-200 animate-pulse rounded-lg w-1/4" />
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="h-20 bg-gray-200 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
     );
   }
 

@@ -1,25 +1,35 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-} from "recharts";
+
+// Lazy load charts for better initial load performance
+const BarChart = dynamic(() => import('recharts').then(mod => ({ default: mod.BarChart })), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded" />
+});
+const Bar = dynamic(() => import('recharts').then(mod => ({ default: mod.Bar })), { ssr: false });
+const XAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.XAxis })), { ssr: false });
+const YAxis = dynamic(() => import('recharts').then(mod => ({ default: mod.YAxis })), { ssr: false });
+const CartesianGrid = dynamic(() => import('recharts').then(mod => ({ default: mod.CartesianGrid })), { ssr: false });
+const Tooltip = dynamic(() => import('recharts').then(mod => ({ default: mod.Tooltip })), { ssr: false });
+const Legend = dynamic(() => import('recharts').then(mod => ({ default: mod.Legend })), { ssr: false });
+const ResponsiveContainer = dynamic(() => import('recharts').then(mod => ({ default: mod.ResponsiveContainer })), { ssr: false });
+const PieChart = dynamic(() => import('recharts').then(mod => ({ default: mod.PieChart })), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded" />
+});
+const Pie = dynamic(() => import('recharts').then(mod => ({ default: mod.Pie })), { ssr: false });
+const Cell = dynamic(() => import('recharts').then(mod => ({ default: mod.Cell })), { ssr: false });
+const LineChart = dynamic(() => import('recharts').then(mod => ({ default: mod.LineChart })), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded" />
+});
+const Line = dynamic(() => import('recharts').then(mod => ({ default: mod.Line })), { ssr: false });
 
 const COLORS = [
   "#3b82f6",
@@ -191,6 +201,24 @@ export default function AnalyticsPage() {
     await fetchAnalytics();
   };
 
+  // Memoize chart data transformations for better performance
+  const transformedChartData = useMemo(() => {
+    if (!data) return { summary: {}, monthly: [], byCategory: [], byProject: [], byVendor: [] };
+    
+    return {
+      summary: data.summary,
+      monthly: data.monthly?.map(m => ({
+        month: m.month,
+        income: Number(m.income) || 0,
+        expenses: Number(m.expenses) || 0,
+        profit: Number(m.profit) || 0
+      })) || [],
+      byCategory: data.byCategory || [],
+      byProject: data.byProject || [],
+      byVendor: data.byVendor || []
+    };
+  }, [data]);
+
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -312,7 +340,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    ${(data.summary?.totalExpenses || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${(transformedChartData.summary?.totalExpenses || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -321,8 +349,8 @@ export default function AnalyticsPage() {
                   <CardTitle className="text-sm font-medium text-gray-500">Net Profit</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className={`text-2xl font-bold ${(data.summary?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {(data.summary?.netProfit || 0) >= 0 ? '' : '-'}${Math.abs(data.summary?.netProfit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <div className={`text-2xl font-bold ${(transformedChartData.summary?.netProfit || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {(transformedChartData.summary?.netProfit || 0) >= 0 ? '' : '-'}${Math.abs(transformedChartData.summary?.netProfit || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -332,7 +360,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-blue-600">
-                    ${(data.totalDeductible || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${(data?.totalDeductible || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </CardContent>
               </Card>
@@ -346,7 +374,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent className="h-[350px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data.monthly}>
+                    <BarChart data={transformedChartData.monthly}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
@@ -404,7 +432,7 @@ export default function AnalyticsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={data.byCategory}
+                        data={transformedChartData.byCategory}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
@@ -413,7 +441,7 @@ export default function AnalyticsPage() {
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {data.byCategory.map((entry, index) => (
+                        {transformedChartData.byCategory.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
@@ -430,7 +458,7 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data.byProject}>
+                    <BarChart data={transformedChartData.byProject}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
@@ -443,14 +471,14 @@ export default function AnalyticsPage() {
               </Card>
 
               {/* Top Vendors */}
-              {data.byVendor && data.byVendor.length > 0 && (
+              {transformedChartData.byVendor && transformedChartData.byVendor.length > 0 && (
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle>Top 5 Vendors</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data.byVendor} layout="vertical">
+                    <BarChart data={transformedChartData.byVendor} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis type="number" />
                       <YAxis dataKey="name" type="category" width={100} />

@@ -50,6 +50,15 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  // Debounce search to improve performance
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   const fetchDashboardData = useCallback(async () => {
     let isMounted = true;
@@ -113,6 +122,26 @@ export function DashboardContent({ user }: DashboardContentProps) {
       netProfit
     };
   }, [expenses, incomes]);
+
+  // Memoize filtered data for better performance
+  const filteredExpenses = useMemo(() => {
+    if (!debouncedQuery) return stats.currentYearExpenses;
+    const query = debouncedQuery.toLowerCase();
+    return stats.currentYearExpenses.filter(e => 
+      e.vendor?.toLowerCase().includes(query) ||
+      e.description?.toLowerCase().includes(query) ||
+      e.amount?.toString().includes(query)
+    );
+  }, [stats.currentYearExpenses, debouncedQuery]);
+
+  const filteredProjects = useMemo(() => {
+    if (!debouncedQuery) return projects;
+    const query = debouncedQuery.toLowerCase();
+    return projects.filter(p => 
+      p.name.toLowerCase().includes(query) ||
+      p.description?.toLowerCase().includes(query)
+    );
+  }, [projects, debouncedQuery]);
 
   // Prepare chart data with useMemo
   const chartData = useMemo((): ChartData[] => {

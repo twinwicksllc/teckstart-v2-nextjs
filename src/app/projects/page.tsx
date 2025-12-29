@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { Project, User } from "@/drizzle.schema";
 
 type AuthUser = Omit<User, "name"> & { name: string };
 import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 
 interface ProjectWithFinancials {
   id: number;
@@ -57,8 +58,8 @@ export default function ProjectsPage() {
       const response = await fetch("/api/projects");
       if (response.ok && isMounted) {
         const data = await response.json();
-        // Fetch financials for each project
-        const projectsWithFinancials = await Promise.all(
+        // Fetch financials for each project using Promise.allSettled for resilience
+        const results = await Promise.allSettled(
           data.map(async (project: Project) => {
             try {
               const detailsRes = await fetch(`/api/projects/${project.id}`);
@@ -77,6 +78,11 @@ export default function ProjectsPage() {
             return project;
           })
         );
+        
+        const projectsWithFinancials = results
+          .filter((r): r is PromiseFulfilledResult<ProjectWithFinancials> => r.status === 'fulfilled')
+          .map(r => r.value);
+        
         if (isMounted) setProjects(projectsWithFinancials);
       }
     } catch (error) {
@@ -110,9 +116,16 @@ export default function ProjectsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+      <DashboardLayout user={user || { id: 0, email: '', name: 'Loading...', role: 'user' }}>
+        <div className="space-y-6 p-6">
+          <div className="h-10 bg-gray-200 animate-pulse rounded-lg w-1/4" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-48 bg-gray-200 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </DashboardLayout>
     );
   }
 
