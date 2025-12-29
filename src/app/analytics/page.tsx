@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -103,42 +103,41 @@ export default function AnalyticsPage() {
   });
   const [vendorOptions, setVendorOptions] = useState<string[]>([]);
 
-  useEffect(() => {
-    const initPage = async () => {
-      await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
-    };
-    initPage();
-  }, []);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
+    let isMounted = true;
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const data = await response.json();
-        // Ensure name is always string
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      if (isMounted) console.error("Failed to fetch user:", err);
     }
-  };
+    return () => { isMounted = false; };
+  }, []);
 
-  const fetchFilters = async () => {
+  const fetchFilters = useCallback(async () => {
+    let isMounted = true;
     try {
       const [pRes, cRes] = await Promise.all([
         fetch("/api/projects"),
         fetch("/api/expenses/categories"),
       ]);
-      if (pRes.ok) setProjects(await pRes.json());
-      if (cRes.ok) setCategories(await cRes.json());
+      if (isMounted) {
+        if (pRes.ok) setProjects(await pRes.json());
+        if (cRes.ok) setCategories(await cRes.json());
+      }
     } catch (err) {
-      console.error("Failed to fetch filters:", err);
+      if (isMounted) console.error("Failed to fetch filters:", err);
     }
-  };
+    return () => { isMounted = false; };
+  }, []);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
+    let isMounted = true;
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -149,7 +148,7 @@ export default function AnalyticsPage() {
       if (filters.endDate) params.append("endDate", filters.endDate);
 
       const response = await fetch(`/api/analytics?${params.toString()}`);
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const json = await response.json();
         setData(json);
         if (json.vendorOptions) {
@@ -157,11 +156,21 @@ export default function AnalyticsPage() {
         }
       }
     } catch (err) {
-      console.error("Failed to fetch analytics:", err);
+      if (isMounted) console.error("Failed to fetch analytics:", err);
     } finally {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }
-  };
+    return () => { isMounted = false; };
+  }, [filters]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const initPage = async () => {
+      const cleanups = await Promise.all([fetchFilters(), fetchAnalytics(), fetchUser()]);
+    };
+    initPage();
+    return () => { isMounted = false; };
+  }, [fetchFilters, fetchAnalytics, fetchUser]);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));

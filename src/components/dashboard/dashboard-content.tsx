@@ -52,6 +52,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchDashboardData = useCallback(async () => {
+    let isMounted = true;
     try {
       const [projectsRes, expensesRes, incomesRes] = await Promise.all([
         fetch("/api/projects"),
@@ -59,7 +60,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
         fetch("/api/incomes")
       ]);
 
-      if (projectsRes.ok && expensesRes.ok) {
+      if (isMounted && projectsRes.ok && expensesRes.ok) {
         const projectsData: Project[] = await projectsRes.json();
         const expensesData: Expense[] = await expensesRes.json();
         const incomesData: Income[] = incomesRes.ok ? await incomesRes.json() : [];
@@ -69,14 +70,18 @@ export function DashboardContent({ user }: DashboardContentProps) {
         setIncomes(incomesData);
       }
     } catch (error) {
-      console.error("Failed to fetch dashboard data:", error);
+      if (isMounted) console.error("Failed to fetch dashboard data:", error);
     } finally {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }
+    return () => { isMounted = false; };
   }, []);
 
   useEffect(() => {
-    fetchDashboardData();
+    const cleanup = fetchDashboardData();
+    return () => {
+      cleanup.then(fn => fn && fn());
+    };
   }, [fetchDashboardData]);
 
   // Calculate stats with useMemo to prevent recalculations

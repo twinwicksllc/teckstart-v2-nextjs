@@ -21,39 +21,44 @@ export default function ExpensesPage() {
   const [loading, setLoading] = useState(true);
   const [editingExpense, setEditingExpense] = useState<ExpenseWithDetails | null>(null);
 
-  useEffect(() => {
-    fetchExpenses();
-    fetchUser();
-  }, []);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
+    let isMounted = true;
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const data = await response.json();
-        // Ensure name is always string
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      if (isMounted) console.error("Failed to fetch user:", err);
     }
-  };
+  }, []);
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
+    let isMounted = true;
     try {
       const response = await fetch("/api/expenses");
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const data = await response.json();
         setExpenses(data);
       }
     } catch (error) {
-      console.error("Failed to fetch expenses:", error);
+      if (isMounted) console.error("Failed to fetch expenses:", error);
     } finally {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const init = async () => {
+      await Promise.all([fetchExpenses(), fetchUser()]);
+    };
+    init();
+    return () => { isMounted = false; };
+  }, [fetchExpenses, fetchUser]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this expense?")) return;

@@ -36,30 +36,26 @@ export default function ProjectsPage() {
   const [editingProject, setEditingProject] = useState<ProjectWithFinancials | null>(null);
   const [addingIncomeToProject, setAddingIncomeToProject] = useState<ProjectWithFinancials | null>(null);
 
-  useEffect(() => {
-    fetchProjects();
-    fetchUser();
-  }, []);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
+    let isMounted = true;
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const data = await response.json();
-        // Ensure name is always string
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      if (isMounted) console.error("Failed to fetch user:", err);
     }
-  };
+  }, []);
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
+    let isMounted = true;
     try {
       const response = await fetch("/api/projects");
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const data = await response.json();
         // Fetch financials for each project
         const projectsWithFinancials = await Promise.all(
@@ -81,14 +77,23 @@ export default function ProjectsPage() {
             return project;
           })
         );
-        setProjects(projectsWithFinancials);
+        if (isMounted) setProjects(projectsWithFinancials);
       }
     } catch (error) {
-      console.error("Failed to fetch projects:", error);
+      if (isMounted) console.error("Failed to fetch projects:", error);
     } finally {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const init = async () => {
+      await Promise.all([fetchProjects(), fetchUser()]);
+    };
+    init();
+    return () => { isMounted = false; };
+  }, [fetchProjects, fetchUser]);
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this project? This will not delete associated expenses but they will become unassigned.")) return;

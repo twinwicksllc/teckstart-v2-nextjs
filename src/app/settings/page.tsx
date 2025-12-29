@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { AWSConfigForm } from "@/components/aws/aws-config-form";
@@ -12,25 +12,28 @@ export default function SettingsPage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
+    let isMounted = true;
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
       });
-      if (response.ok) {
+      if (response.ok && isMounted) {
         const data = await response.json();
         setUser({ ...data, name: data.name || "" });
       }
     } catch (err) {
-      console.error("Failed to fetch user:", err);
+      if (isMounted) console.error("Failed to fetch user:", err);
     } finally {
-      setLoading(false);
+      if (isMounted) setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchUser();
+    return () => { isMounted = false; };
+  }, [fetchUser]);
 
   if (loading) {
     return (
