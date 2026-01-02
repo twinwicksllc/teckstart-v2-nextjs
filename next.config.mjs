@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable Turbopack for now due to font loading issues
+  turbopack: false,
   // Next.js 16: use top-level serverExternalPackages instead of deprecated experimental key
   serverExternalPackages: [
     "@aws-sdk/client-s3",

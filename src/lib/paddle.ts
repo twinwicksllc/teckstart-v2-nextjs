@@ -1,9 +1,8 @@
-import { initializePaddle } from '@paddle/paddle-node-sdk';
+import { Paddle, Environment } from '@paddle/paddle-node-sdk';
 
 // Initialize Paddle with sandbox environment
-const paddle = initializePaddle({
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
-  apiKey: process.env.PADDLE_API_KEY || '',
+const paddle = new Paddle(process.env.PADDLE_API_KEY || '', {
+  environment: (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox') as Environment,
 });
 
 // Paddle environment types

@@ -358,7 +358,7 @@ export default function AdminInvoicesPage() {
                   <ol className="text-sm space-y-1 list-decimal list-inside">
                     <li>Create a <code className="bg-background px-1 rounded">.env.local</code> file</li>
                     <li>Add your <code className="bg-background px-1 rounded">DATABASE_URL</code></li>
-                    <li>Run: <code className="bg-background px-1 rounded">npx tsx scripts/migrate.ts</code>
+                    <li>Run: <code className="bg-background px-1 rounded">npx tsx scripts/migrate.ts</code></li>
                     <li>Restart the development server</li>
                   </ol>
                 </div>
