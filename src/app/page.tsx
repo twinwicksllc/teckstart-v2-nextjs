@@ -9,24 +9,24 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <img alt="TeckStart logo" src="/teckstart-logo.png" className="h-10 w-10 rounded" />
+              <img alt="TeckStart logo" src="/teckstart-logo.png" className="h-24 w-24 rounded" />
             </Link>
             <div className="hidden md:flex items-center gap-6">
               <Link
                 href="#features"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Features
               </Link>
               <Link
                 href="#process"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 How it Works
               </Link>
               <Link
                 href="/login"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Login
               </Link>
@@ -34,7 +34,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 Get Started
               </Link>
@@ -88,7 +88,7 @@ export default function LandingPage() {
             </div>
             <div className="hidden lg:block">
               <div className="rounded-lg overflow-hidden shadow-2xl">
-                <img alt="Dashboard mockup" src="/placeholder-dashboard.png" className="w-full h-auto" />
+                <img alt="Dashboard mockup" src="/dashboard-example.jpg" className="w-full h-auto" />
               </div>
             </div>
           </div>

@@ -111,11 +111,12 @@ export function DashboardContent({ user }: DashboardContentProps) {
 
     return last6Months.map(({ year, month, monthNum }) => {
       const monthStr = `${year}-${month}`
-      const monthExpenses = stats.currentYearExpenses.filter((e) => {
+      // Use ALL expenses and incomes, not just current year
+      const monthExpenses = expenses.filter((e) => {
         const expenseMonth = new Date(e.expenseDate).toISOString().split("-").slice(0, 2).join("-")
         return expenseMonth === monthStr
       })
-      const monthIncomes = stats.currentYearIncomes.filter((i) => {
+      const monthIncomes = incomes.filter((i) => {
         const incomeMonth = new Date(i.incomeDate).toISOString().split("-").slice(0, 2).join("-")
         return incomeMonth === monthStr
       })
@@ -132,7 +133,7 @@ export function DashboardContent({ user }: DashboardContentProps) {
         profit: incomeTotal - expenseTotal,
       }
     })
-  }, [stats.currentYearExpenses, stats.currentYearIncomes])
+  }, [expenses, incomes])
 
   const currentYear = new Date().getFullYear()
 
