@@ -285,3 +285,97 @@ export const receipts = pgTable("receipts", {
 export type Receipt = typeof receipts.$inferSelect;
 export type InsertReceipt = typeof receipts.$inferInsert;
 
+/**
+ * Paddle-related enums
+ */
+export const paddleInvoiceStatusEnum = pgEnum("paddle_invoice_status", ["draft", "sent", "paid", "overdue", "void"]);
+export const paddlePaymentStatusEnum = pgEnum("paddle_payment_status", ["created", "completed", "failed", "refunded"]);
+
+/**
+ * Paddle customers - stores customer information from Paddle
+ */
+export const paddleCustomers = pgTable("paddleCustomers", {
+  id: serial("id").primaryKey(),
+  paddleCustomerId: varchar("paddleCustomerId", { length: 100 }).unique().notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  address: jsonb("address").$type<{
+    countryCode: string;
+    region?: string;
+    city?: string;
+    postalCode?: string;
+    line1?: string;
+    line2?: string;
+  }>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  emailIdx: index("paddle_customers_email_idx").on(table.email),
+  paddleCustomerIdIdx: index("paddle_customers_paddle_id_idx").on(table.paddleCustomerId),
+}));
+
+export type PaddleCustomer = typeof paddleCustomers.$inferSelect;
+export type InsertPaddleCustomer = typeof paddleCustomers.$inferInsert;
+
+/**
+ * Paddle invoices - stores invoice data created by admin
+ */
+export const paddleInvoices = pgTable("paddleInvoices", {
+  id: serial("id").primaryKey(),
+  paddleInvoiceId: varchar("paddleInvoiceId", { length: 100 }).unique(),
+  customerId: integer("customerId").references(() => paddleCustomers.id, { onDelete: "cascade" }),
+  invoiceNumber: varchar("invoiceNumber", { length: 100 }).notNull(),
+  currencyCode: varchar("currencyCode", { length: 3 }).default("USD").notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  taxAmount: decimal("taxAmount", { precision: 12, scale: 2 }),
+  totalAmount: decimal("totalAmount", { precision: 12, scale: 2 }).notNull(),
+  status: paddleInvoiceStatusEnum("status").default("draft").notNull(),
+  dueDate: timestamp("dueDate"),
+  notes: text("notes"),
+  items: jsonb("items").$type<Array<{
+    description: string;
+    amount: number;
+    quantity: number;
+    taxRate?: string;
+  }>>().notNull(),
+  checkoutUrl: text("checkoutUrl"),
+  paidAt: timestamp("paidAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  customerIdIdx: index("paddle_invoices_customer_id_idx").on(table.customerId),
+  statusIdx: index("paddle_invoices_status_idx").on(table.status),
+  invoiceNumberIdx: index("paddle_invoices_number_idx").on(table.invoiceNumber),
+  paddleInvoiceIdIdx: index("paddle_invoices_paddle_id_idx").on(table.paddleInvoiceId),
+}));
+
+export type PaddleInvoice = typeof paddleInvoices.$inferSelect;
+export type InsertPaddleInvoice = typeof paddleInvoices.$inferInsert;
+
+/**
+ * Paddle payments - stores payment transaction data
+ */
+export const paddlePayments = pgTable("paddlePayments", {
+  id: serial("id").primaryKey(),
+  paddleTransactionId: varchar("paddleTransactionId", { length: 100 }).unique(),
+  invoiceId: integer("invoiceId").references(() => paddleInvoices.id, { onDelete: "cascade" }),
+  customerId: integer("customerId").references(() => paddleCustomers.id, { onDelete: "cascade" }),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  currencyCode: varchar("currencyCode", { length: 3 }).notNull(),
+  status: paddlePaymentStatusEnum("status").notNull(),
+  paymentMethod: varchar("paymentMethod", { length: 100 }),
+  paidAt: timestamp("paidAt"),
+  receiptUrl: text("receiptUrl"),
+  receiptData: jsonb("receiptData").$type<Record<string, unknown>>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+}, (table) => ({
+  invoiceIdIdx: index("paddle_payments_invoice_id_idx").on(table.invoiceId),
+  customerIdIdx: index("paddle_payments_customer_id_idx").on(table.customerId),
+  statusIdx: index("paddle_payments_status_idx").on(table.status),
+  paddleTransactionIdIdx: index("paddle_payments_paddle_id_idx").on(table.paddleTransactionId),
+}));
+
+export type PaddlePayment = typeof paddlePayments.$inferSelect;
+export type InsertPaddlePayment = typeof paddlePayments.$inferInsert;
+

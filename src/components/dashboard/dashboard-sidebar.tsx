@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutDashboard, Receipt, BarChart3, FileText, Settings, LogOut } from "lucide-react"
+import { LayoutDashboard, Receipt, BarChart3, FileText, Settings, LogOut, DollarSign } from "lucide-react"
 import Image from "next/image"
 
 interface User {
@@ -20,6 +20,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
     { icon: Receipt, label: "Expenses", href: "/expenses" },
     { icon: FileText, label: "Projects", href: "/projects" },
     { icon: BarChart3, label: "Analytics", href: "/analytics" },
+    ...(user.role === "admin" ? [{ icon: DollarSign, label: "Invoices", href: "/admin/invoices" }] : []),
     { icon: Settings, label: "Settings", href: "/settings" },
   ]
 

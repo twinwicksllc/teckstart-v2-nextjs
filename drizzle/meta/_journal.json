@@ -15,6 +15,13 @@
       "when": 1766793177468,
       "tag": "0001_flat_polaris",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767336672248,
+      "tag": "0002_public_thanos",
+      "breakpoints": true
     }
   ]
 }

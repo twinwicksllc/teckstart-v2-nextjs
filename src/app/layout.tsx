@@ -8,26 +8,14 @@ const geist = Geist({ subsets: ["latin"] })
 const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "TeckStart - Freelance Expense & Project Tracker",
-  description: "AI-powered freelance expense and project tracking with smart receipt parsing",
-  generator: "v0.app",
+  title: "TeckStart - Freelance Business Management",
+  description: "Comprehensive platform for managing your freelance business finances, expenses, projects, and invoicing with AI-powered features.",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon-180x180.png",
+    shortcut: "/favicon.ico",
   },
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
@@ -37,6 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      
       <body
         className={`${geist.className} ${geistMono.className} font-sans antialiased teckstart-body`}
         suppressHydrationWarning
