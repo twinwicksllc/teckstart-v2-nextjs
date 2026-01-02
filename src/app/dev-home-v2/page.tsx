@@ -26,7 +26,7 @@ export default function HomePage() {
         <nav className="backdrop-blur-xl sticky top-0 z-50 border-b border-purple-700 bg-slate-100/80">
           <div className="container mx-auto px-6 py-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Image src="/teckstart-logo-v5-trimmed.png" alt="TeckStart" width={200} height={60} className="block leading-none" />
+              <Image src="/teckstart-logo.png" alt="TeckStart" width={200} height={60} className="block leading-none" />
             </div>
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" asChild className="text-[#0E2D4C] hover:text-[#FEB33C]">
@@ -51,7 +51,7 @@ export default function HomePage() {
             </Badge>
             
             <div className="flex justify-center mb-4">
-              <Image src="/teckstart-logo-v5-trimmed.png" alt="TeckStart" width={400} height={120} className="block leading-none" />
+              <Image src="/teckstart-logo.png" alt="TeckStart" width={400} height={120} className="block leading-none" />
             </div>
             
             <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed text-purple-700">
@@ -239,7 +239,7 @@ export default function HomePage() {
           <div className="container mx-auto px-6 py-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
               <div className="flex items-center gap-2">
-                <Image src="/teckstart-logo-v5-trimmed.png" alt="TeckStart" width={200} height={60} className="block leading-none" />
+                <Image src="/teckstart-logo.png" alt="TeckStart" width={200} height={60} className="block leading-none" />
               </div>
               <p>© 2025 TeckStart. All rights reserved.</p>
             </div>
