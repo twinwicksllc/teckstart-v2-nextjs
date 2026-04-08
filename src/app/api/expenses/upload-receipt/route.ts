@@ -51,15 +51,20 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (existingReceipt) {
-      return NextResponse.json(
-        { 
-          error: "Duplicate upload detected", 
-          message: "You already uploaded this file recently.",
-          receiptId: existingReceipt.id,
-          status: existingReceipt.status
-        },
-        { status: 409 }
-      );
+      // If the previous attempt failed, allow re-upload by deleting the old record
+      if (existingReceipt.status === "failed") {
+        await db.delete(receipts).where(eq(receipts.id, existingReceipt.id));
+      } else {
+        return NextResponse.json(
+          { 
+            error: "Duplicate upload detected", 
+            message: "You already uploaded this file recently.",
+            receiptId: existingReceipt.id,
+            status: existingReceipt.status
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // Upload to S3 with compression
