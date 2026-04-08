@@ -100,7 +100,7 @@ Respond with only the JSON object.`;
     };
 
     const command = new InvokeModelCommand({
-      modelId: "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
+      modelId: "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
       contentType: "application/json",
       accept: "application/json",
       body: JSON.stringify({
@@ -189,7 +189,7 @@ export async function parseReceiptWithHaiku(
     };
 
     const command = new InvokeModelCommand({
-      modelId: "us.anthropic.claude-3-haiku-20240307-v1:0",
+      modelId: "us.anthropic.claude-haiku-4-5-20251001-v1:0",
       contentType: "application/json",
       accept: "application/json",
       body: JSON.stringify({
