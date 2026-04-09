@@ -3,7 +3,7 @@ import {
   InvokeModelCommand,
 } from "@aws-sdk/client-bedrock-runtime";
 
-// MODEL UPDATE v4 - 2026-01-28 - Using confirmed active models
+// MODEL UPDATE v5 - 2026-01-29 - Fixed JSON parsing (strip markdown fences) + Haiku fallback model
 const bedrockClient = new BedrockRuntimeClient({
   region: process.env.AWS_REGION || "us-east-1",
 });
@@ -26,7 +26,21 @@ export interface ParsedReceipt {
 }
 
 /**
- * Parse receipt using Claude 3.5 Sonnet via Bedrock
+ * Strip markdown code fences from Claude responses.
+ * Newer Claude models sometimes wrap JSON in ```json ... ``` blocks.
+ */
+function extractJsonFromResponse(text: string): string {
+  // Remove ```json ... ``` or ``` ... ``` wrappers
+  const fenceMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenceMatch) {
+    return fenceMatch[1].trim();
+  }
+  // Return trimmed text as-is if no fences found
+  return text.trim();
+}
+
+/**
+ * Parse receipt using Claude Sonnet 4.5 via Bedrock (primary)
  */
 export async function parseReceiptWithBedrock(
   imageBase64: string,
@@ -60,9 +74,9 @@ Important rules:
 3. If you cannot determine a field, omit it rather than guessing
 4. For currency, infer from symbols ($ = USD, € = EUR, £ = GBP, etc.)
 5. Preserve line item details when present; omit if not visible
-6. Return ONLY valid JSON, no additional text
+6. Return ONLY valid JSON with no markdown formatting, no code fences, no additional text
 
-Respond with only the JSON object.`;
+Respond with only the raw JSON object, no \`\`\` wrapping.`;
 
   try {
     const isPdf = imageMediaType === "application/pdf";
@@ -121,13 +135,14 @@ Respond with only the JSON object.`;
       );
       if (textContent) {
         try {
-          const parsed = JSON.parse(textContent.text);
+          const cleanedText = extractJsonFromResponse(textContent.text);
+          const parsed = JSON.parse(cleanedText);
           return {
             ...parsed,
             rawResponse: parsedResponse,
           };
         } catch {
-          console.error("Failed to parse Claude response as JSON:", textContent.text);
+          console.error("Failed to parse Claude Sonnet response as JSON:", textContent.text);
           throw new Error("AI parsing returned invalid JSON format");
         }
       }
@@ -135,7 +150,7 @@ Respond with only the JSON object.`;
 
     throw new Error("No text response from AI model");
   } catch (error) {
-    console.error("Bedrock parsing error:", error);
+    console.error("Bedrock Sonnet parsing error:", error);
     if (error instanceof Error) {
       throw new Error(`Receipt parsing failed: ${error.message}`);
     }
@@ -144,13 +159,15 @@ Respond with only the JSON object.`;
 }
 
 /**
- * Fallback to Claude 3.5 Haiku for faster/cheaper parsing if needed
+ * Fallback using Claude 3.5 Haiku (claude-3-5-haiku-20241022) - lightweight and reliable
  */
 export async function parseReceiptWithHaiku(
   imageBase64: string,
   imageMediaType: string
 ): Promise<ParsedReceipt> {
-  const prompt = `Extract receipt information as JSON: {merchantName, date (YYYY-MM-DD), total (number), tax (number or null), currency, category, isTaxable (boolean), lineItems (array of {description, quantity, unitPrice, amount})}. Return only valid JSON.`;
+  const prompt = `Extract receipt information as JSON with these fields: merchantName, date (YYYY-MM-DD), total (number), tax (number or null), currency, category (one of: Advertising, Office Supplies, Meals, Travel, Equipment, Software, Professional Services, Internet, Phone, Utilities, Insurance, Rent, Other), isTaxable (boolean), lineItems (array of {description, quantity, unitPrice, amount}).
+
+Return only a raw JSON object with no markdown, no code fences, no additional text.`;
 
   try {
     const isPdf = imageMediaType === "application/pdf";
@@ -189,7 +206,8 @@ export async function parseReceiptWithHaiku(
     };
 
     const command = new InvokeModelCommand({
-      modelId: "us.anthropic.claude-haiku-4-5-20251001-v1:0",
+      // Falling back to Claude 3.5 Haiku - stable, no marketplace subscription needed
+      modelId: "us.anthropic.claude-3-5-haiku-20241022-v1:0",
       contentType: "application/json",
       accept: "application/json",
       body: JSON.stringify({
@@ -210,7 +228,8 @@ export async function parseReceiptWithHaiku(
       );
       if (textContent) {
         try {
-          const parsed = JSON.parse(textContent.text);
+          const cleanedText = extractJsonFromResponse(textContent.text);
+          const parsed = JSON.parse(cleanedText);
           return {
             ...parsed,
             rawResponse: parsedResponse,
